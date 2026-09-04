@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planillas Inteligentes — especIAlizate</title>
+  <link rel="stylesheet" href="aula.css">
+</head>
+<body class="px">
+  <main class="px-panel">
+    <img class="px-logo" src="img/especializate-logo-blanco.png" alt="especIAlizate">
+    <span class="px-eyebrow">Curso</span>
+    <h1 class="px-title" data-idx-title>Planillas <span class="ia">Inteligentes</span></h1>
+    <p class="px-sub">Inteligencia Artificial aplicada al trabajo</p>
+    <p class="px-welcome">Una experiencia gamificada: avanzá por módulos, completá actividades, sumá experiencia y desbloqueá insignias a medida que progresás.</p>
+
+    <a class="px-cta" data-idx-cta href="inicio.html" target="_blank" rel="noopener noreferrer">
+      <span data-idx-cta-label>Comenzar el curso</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+
+    <div class="px-progress" data-idx-progress></div>
+
+    <div class="px-sep"></div>
+
+    <nav class="px-stepper" aria-label="Recorrido del curso">
+      <span class="px-stage" data-stage="inicio"><span class="dot"></span> Inicio</span>
+      <span class="px-stage-line"></span>
+      <span class="px-stage" data-stage="modulos"><span class="dot"></span> Módulos <span class="lbl-full">1–5</span></span>
+      <span class="px-stage-line"></span>
+      <span class="px-stage" data-stage="eval"><span class="dot"></span> Evaluación</span>
+      <span class="px-stage-line"></span>
+      <span class="px-stage" data-stage="cert"><span class="dot"></span> Certificación</span>
+    </nav>
+
+    <div class="px-badges" data-idx-badges></div>
+
+    <div class="px-help">
+      <button type="button" class="px-help-btn" data-open-faq>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Preguntas frecuentes
+      </button>
+      <button type="button" class="px-help-btn" data-open-contact>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+        Contacto
+      </button>
+    </div>
+  </main>
+
+  <!-- Modal: Preguntas frecuentes -->
+  <div class="sb-modal" data-modal="faq" hidden>
+    <div class="sb-modal-bg" data-modal-close></div>
+    <div class="sb-modal-card" role="dialog" aria-modal="true" aria-label="Preguntas frecuentes">
+      <button type="button" class="sb-modal-x" data-modal-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <h2 class="sb-modal-tt">Preguntas frecuentes</h2>
+      <dl class="faq-list">
+        <dt>¿Cómo navego el aula?</dt><dd>El panel de la izquierda es el mapa del curso: desde ahí entrás al Inicio, a cada módulo, sus unidades y el cuestionario de cierre. Se despliega al tocar un módulo.</dd>
+        <dt>¿Cómo se avanza?</dt><dd>El recorrido es progresivo. Empezás por los contenidos iniciales; al completarlos se abre el Módulo 1, y cada módulo habilita el siguiente.</dd>
+        <dt>¿Qué es la experiencia (XP)?</dt><dd>Es la experiencia que vas sumando al completar contenidos. Funciona como indicador de tu progreso: cuanto más avanzás, más XP acumulás.</dd>
+        <dt>¿Para qué sirven las insignias?</dt><dd>Reconocen tus logros. <strong>Iniciante:</strong> etapa inicial. <strong>Explorador:</strong> Módulo 1. <strong>Arquitecto:</strong> Módulo 3. <strong>Experto:</strong> Módulo 5.</dd>
+        <dt>¿Cuándo se habilitan los cuestionarios?</dt><dd>El cuestionario de cada módulo se habilita al completar todas sus unidades. Se rinde en Moodle (con tu cuenta del aula virtual) y después marcás su aprobación para cerrar el módulo.</dd>
+        <dt>¿Cómo llego a la certificación?</dt><dd>Al completar todos los módulos se habilita la evaluación final. Al aprobarla, accedés a tu certificación.</dd>
+        <dt>¿Dónde se guarda mi progreso?</dt><dd>En este navegador. Si cambiás de dispositivo o borrás los datos del sitio, el avance no se traslada.</dd>
+        <dt>¿Qué pasa si ingreso desde otra computadora o navegador?</dt><dd>Vas a tener que volver a marcar los contenidos que ya completaste para reconstruir tu avance en ese navegador. Los cuestionarios no deberás repetirlos: quedan registrados en tu cuenta de Moodle dentro del campus.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Modal: contacto -->
+  <div class="sb-modal" data-modal="contact" hidden>
+    <div class="sb-modal-bg" data-modal-close></div>
+    <div class="sb-modal-card sb-modal-sm" role="dialog" aria-modal="true" aria-label="Ayuda y contacto">
+      <button type="button" class="sb-modal-x" data-modal-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="ct-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h2 class="sb-modal-tt">¿Necesitás ayuda?</h2>
+      <p class="ct-tx">Si tenés dudas sobre el contenido o problemas con la plataforma, escribinos y te damos una mano.</p>
+      <a class="ct-mail" href="mailto:especializate@bue.edu.ar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+        especializate@bue.edu.ar
+      </a>
+      <p class="ct-note">Recordá que los cuestionarios se rinden en Moodle: necesitás estar logueado en tu cuenta del aula virtual.</p>
+    </div>
+  </div>
+
+  <script src="course.config.js"></script>
+  <script src="progress.js"></script>
+  <script>
+  (function () {
+    var AP = window.AulaProgress, CFG = window.COURSE_CONFIG;
+    function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function qs(s){ return document.querySelector(s); }
+
+    /* --- modales (FAQ / contacto): abrir y cerrar --- */
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-open-faq]')) show('faq');
+      else if (e.target.closest('[data-open-contact]')) show('contact');
+      else if (e.target.closest('[data-modal-close]')) hideAll();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideAll(); });
+    function show(n){ var m = qs('[data-modal="'+n+'"]'); if(m){ m.hidden=false; document.body.classList.add('modal-open'); } }
+    function hideAll(){ Array.prototype.forEach.call(document.querySelectorAll('[data-modal]'), function(m){ m.hidden=true; }); document.body.classList.remove('modal-open'); }
+
+    if (!AP || !CFG) return;
+
+    function unitCount(mc){ return (mc.units && mc.units.length) || 0; }
+    function resumeUrl(s){
+      var introDone = !!(s.intro.especializate && s.intro.programa && s.intro.introduccion);
+      if (!introDone) return 'inicio.html';
+      for (var i=0;i<CFG.modules.length;i++){
+        var mc = CFG.modules[i], n = mc.n, m = s.modules[String(n)], uc = unitCount(mc);
+        var complete = !!(m && m.quiz);
+        for (var u=1;u<=uc;u++){ if(!m['u'+u]){ complete=false; break; } }
+        if (!complete){
+          for (var u2=1;u2<=uc;u2++){ if(!m['u'+u2]) return 'unidad.html?m='+n+'&u='+u2; }
+          return 'cuestionario.html?m='+n;
+        }
+      }
+      return 'final.html';
+    }
+
+    var star = '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 21.4l1.4-6.8L2.2 9.9l6.9-.8z"/></svg>';
+
+    function apply(s){
+      var introDone = !!(s.intro.especializate && s.intro.programa && s.intro.introduccion);
+      var hasProgress = introDone || s.intro.especializate || s.intro.programa || s.intro.introduccion || (s.xp > 0);
+
+      try { document.title = CFG.name + ' — especIAlizate'; } catch(e){}
+      var titleEl = qs('[data-idx-title]');
+      if (titleEl) titleEl.innerHTML = esc(CFG.name).replace(/\bIA\b/g, '<span class="ia">IA</span>').replace(/\bInteligentes\b/g, '<span class="ia">Inteligentes</span>');
+      var modRange = qs('[data-stage="modulos"] .lbl-full'); if (modRange) modRange.textContent = '1\u2013' + CFG.modules.length;
+
+      var cta = qs('[data-idx-cta]'), ctaLbl = qs('[data-idx-cta-label]');
+      if (cta) cta.setAttribute('href', hasProgress ? resumeUrl(s) : 'inicio.html');
+      if (ctaLbl) ctaLbl.textContent = hasProgress ? 'Continuar donde quedaste' : 'Comenzar el curso';
+
+      var prog = qs('[data-idx-progress]');
+      if (prog){
+        if (hasProgress){
+          var pct = AP.percent ? AP.percent(s) : 0, xp = s.xp||0, tot = AP.TOTAL_XP||0;
+          var ach = AP.currentAchievement ? AP.currentAchievement(s) : null;
+          var goal = AP.nextGoalText ? AP.nextGoalText(s) : '';
+          prog.innerHTML =
+            '<div class="px-prog-bar"><div class="px-prog-fill" style="width:'+pct+'%"></div></div>' +
+            '<div class="px-prog-row">' +
+              '<span class="px-prog-item"><b>'+pct+'%</b> completado</span>' +
+              '<span class="px-prog-item px-prog-xp">'+star+'<b>'+xp+'</b> / '+tot+' XP</span>' +
+              (ach ? '<span class="px-prog-item"><img src="'+esc(ach.img)+'" alt=""> '+esc(ach.name)+'</span>' : '') +
+            '</div>' +
+            (goal ? '<p class="px-goal">Próximo objetivo: <b>'+esc(goal)+'</b></p>' : '');
+        } else {
+          prog.innerHTML = '<p class="px-motiv">Empezá tu recorrido: completá los tres contenidos iniciales y desbloqueá el Módulo 1.</p>';
+        }
+      }
+
+      var badgesEl = qs('[data-idx-badges]');
+      if (badgesEl && AP.ACHIEVEMENTS){
+        badgesEl.innerHTML = AP.ACHIEVEMENTS.map(function(a){
+          var on = typeof a.unlocked === 'function' ? a.unlocked(s) : false;
+          return '<span class="px-badge '+(on?'is-on':'is-off')+'"><img src="'+esc(a.img)+'" alt="Insignia '+esc(a.name)+'"><small>'+esc(a.name)+'</small></span>';
+        }).join('');
+      }
+
+      var allMods = CFG.modules.every(function(mc){ var m=s.modules[String(mc.n)]; if(!m||!m.quiz) return false; var uc=unitCount(mc); for(var u=1;u<=uc;u++){ if(!m['u'+u]) return false; } return true; });
+      function stage(k,done){ var el = qs('[data-stage="'+k+'"]'); if(el){ el.classList.toggle('is-done', !!done); } }
+      stage('inicio', introDone);
+      stage('modulos', allMods);
+      stage('eval', !!(s.final && s.final.quiz));
+      stage('cert', !!s.certificate);
+    }
+
+    apply(AP.load());
+    window.__idx = { apply: apply, resumeUrl: resumeUrl };
+  })();
+  </script>
+</body>
+</html>

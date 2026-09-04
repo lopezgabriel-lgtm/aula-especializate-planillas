@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio y bienvenida — Introducción a la IA · Especializate</title>
+  <link rel="stylesheet" href="aula.css">
+</head>
+<body data-screen="inicio">
+  <div class="container screen-wide">
+    <main data-page-main>
+      <!-- La pantalla se renderiza acá desde course.config.js + progress.js -->
+      <div data-inicio></div>
+    </main>
+  </div>
+
+  <!-- Toast compartido (avisos de la lógica) -->
+  <div id="toast" role="alert" aria-live="assertive" class="toast-info">
+    <span class="toast-icon" data-toast-icon aria-hidden="true"></span>
+    <span id="toast-message">Aviso</span>
+  </div>
+
+  <div id="achv-modal" class="achv-modal" hidden>
+    <div class="achv-modal-backdrop" data-achv-close></div>
+    <div class="achv-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="achv-modal-title" aria-describedby="achv-modal-text">
+      <button type="button" class="achv-modal-close" data-achv-close aria-label="Cerrar">&times;</button>
+      <div class="achv-confetti" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="achv-modal-medal">
+        <img id="achv-modal-img" src="" alt="Insignia desbloqueada">
+      </div>
+      <h2 id="achv-modal-title" class="achv-modal-title">¡Felicitaciones!</h2>
+      <p class="achv-modal-badge">Insignia <strong id="achv-modal-badge">—</strong></p>
+      <div id="achv-modal-text" class="achv-modal-text"></div>
+      <button type="button" class="btn btn-complete achv-modal-cta" data-achv-close>¡Genial, seguir!</button>
+    </div>
+  </div>
+
+
+  <!-- Contenido -->
+  <script src="course.config.js"></script>
+  <script src="progress.js"></script>
+  <script src="screens.js"></script>
+  <script>AulaScreens.initInicio();</script>
+  <!-- App-shell: sidebar + header -->
+  <script src="shell.js"></script>
+  <!-- Ayuda guiada (product tour) -->
+  <script src="tour.js"></script>
+  <script>AulaTour.init('inicio');</script>
+</body>
+</html>
