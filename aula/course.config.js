@@ -25,20 +25,20 @@ window.COURSE_CONFIG = {
         "description": "Mirá este video para conocer qué es especIAlizate y cómo está organizado el recorrido."
       },
       {
+        "step": "intro.introduccion",
+        "required": true,
+        "label": "Introducción al curso",
+        "kind": "video",
+        "youtubeId": "q1ppNN96TGo",
+        "description": "En este video vas a conocer la propuesta del curso y cómo se organiza el recorrido."
+      },
+      {
         "step": "intro.programa",
         "required": true,
         "label": "Programa del curso",
         "kind": "pdf",
         "url": "https://drive.google.com/file/d/1WJmM2uzwEAPCooK0HIVVnIdKOIZhxR6X/view?usp=sharing",
         "description": "Consultá el programa para conocer la propuesta formativa, los objetivos y la modalidad de cursada."
-      },
-      {
-        "step": "intro.introduccion",
-        "required": true,
-        "label": "Introducción al curso",
-        "kind": "video",
-        "youtubeId": "1JXQrXnI2oU",
-        "description": "En este video vas a conocer la propuesta del curso y cómo se organiza el recorrido."
       }
     ]
   },
@@ -913,7 +913,7 @@ window.COURSE_CONFIG = {
   "final": {
     "label": "Evaluación final",
     "href": "final.html",
-    "description": "La evaluación final integra todo el recorrido. Se habilita al completar los cinco módulos y, al aprobarla, activás tu certificación.",
+    "description": "La evaluación final integra todo el recorrido. Se habilita al completar los cinco módulos; se rinde y se aprueba en Moodle, donde también se valida la disponibilidad de tu certificación.",
     "quizUrl": "https://aulasvirtuales.bue.edu.ar/mod/quiz/view.php?id=979592",
     "certUrl": "https://aulasvirtuales.bue.edu.ar/mod/customcert/view.php?id=980625"
   },

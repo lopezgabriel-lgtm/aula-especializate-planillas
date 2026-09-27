@@ -835,8 +835,8 @@ window.AulaProgress = (function () {
     setText('status-general', generalStatusText(state));
 
     setText('cert-msg', isUnlocked('certificate', state)
-      ? '¡Disponible! Ya podés acceder a tu certificado del curso.'
-      : 'Completá la evaluación final para desbloquearlo.');
+      ? 'Accedé a Moodle para consultar y descargar tu certificado. La aprobación y la disponibilidad se validan allí.'
+      : 'Completá la Evaluación final para habilitar este acceso.');
 
     // --- Insignias gamificadas: insignia actual (hero) + strip + modales ---
     renderCurrentBadge(state);

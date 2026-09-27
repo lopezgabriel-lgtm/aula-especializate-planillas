@@ -121,7 +121,8 @@ window.AulaShell = (function () {
     collapse: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
     burger:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
     final:    '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1h13l-2.5 4L18 11H5"/></svg>',
-    cert:     '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>'
+    cert:     '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>',
+    lock:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
   };
   function finalHref() { return (CFG && CFG.final && CFG.final.href) || 'final.html'; }
   function certUrl() { return (CFG && CFG.final && CFG.final.certUrl) || ''; }
@@ -145,10 +146,9 @@ window.AulaShell = (function () {
       ['¿Qué es la experiencia (XP)?', 'Es la experiencia que vas sumando al completar contenidos. Funciona como indicador de tu progreso: cuanto más avanzás, más XP acumulás.'],
       ['¿Para qué sirven las insignias?', 'Reconocen tus logros. <strong>Iniciante:</strong> etapa inicial. <strong>Explorador:</strong> Módulo 1. <strong>Arquitecto:</strong> Módulo 3. <strong>Experto:</strong> Módulo 5.'],
       ['¿Cómo se desbloquean unidades y módulos?', 'Dentro de cada módulo las unidades se abren de a una: la siguiente se habilita al completar la anterior. Y el módulo siguiente se abre al terminar el actual.'],
-      ['¿Cuándo se habilitan los cuestionarios?', 'El cuestionario de cada módulo se habilita al completar todas sus unidades. Se rinde en Moodle (con tu cuenta del aula virtual) y después marcás su aprobación para cerrar el módulo.'],
-      ['¿Cómo llego a la certificación?', 'Al completar los 5 módulos se habilita la evaluación final. Al aprobarla, accedés a tu certificación.'],
-      ['¿Dónde se guarda mi progreso?', 'En este navegador. Si cambiás de dispositivo o borrás los datos del sitio, el avance no se traslada.'],
-      ['¿Qué pasa si ingreso desde otra computadora o navegador?', 'Vas a tener que volver a marcar los contenidos que ya completaste para reconstruir tu avance en ese navegador. Los cuestionarios no deberás repetirlos: quedan registrados en tu cuenta de Moodle dentro del campus.']
+      ['¿Cuándo se habilitan los cuestionarios?', 'El cuestionario de cada módulo se habilita al completar todas sus unidades. Se rinde en Moodle (con tu cuenta del aula virtual) y después lo marcás como realizado para cerrar el módulo.'],
+      ['¿Cómo llego a la certificación?', 'Al completar los 5 módulos y aprobar los cuestionarios, se habilita la Evaluación final. Una vez aprobada, podés acceder a tu certificación desde Moodle.'],
+      ['¿Qué pasa con mi progreso si salgo del aula?', 'Tu progreso está asociado a tu cuenta de Moodle. Podés salir cuando quieras y, cuando vuelvas, solo tenés que ingresar nuevamente al aula desde Moodle. Vas a continuar desde donde lo dejaste.']
     ].map(function (qa) { return '<dt>' + qa[0] + '</dt><dd>' + qa[1] + '</dd>'; }).join('');
 
     return '' +
@@ -169,6 +169,7 @@ window.AulaShell = (function () {
           '<p class="ct-tx">Si tenés dudas sobre el contenido o problemas con la plataforma, escribinos y te damos una mano.</p>' +
           '<a class="ct-mail" href="mailto:especializate@bue.edu.ar">' + IC.mail + ' especializate@bue.edu.ar</a>' +
           '<p class="ct-note">Recordá que los cuestionarios se rinden en Moodle: necesitás estar logueado en tu cuenta del aula virtual.</p>' +
+          '<p class="ct-note">Podés seguir avanzando por los contenidos aunque todavía tengas cuestionarios pendientes de aprobación. Por eso, es importante que revises tu avance en Moodle y te asegures de completar y aprobar cada cuestionario para poder acceder a la Evaluación final y a la certificación.</p>' +
         '</div>' +
       '</div>';
   }
@@ -322,9 +323,20 @@ window.AulaShell = (function () {
 
     /* Nodo "Descargá tu certificado" (enlace a Moodle), después de la Evaluación final */
     if (CFG.final && CFG.final.certUrl) {
-      html += '<div class="mod mod-single mod-cert">' +
-        '<a class="mod-head mod-head-link" href="' + esc(CFG.final.certUrl) + '" target="_blank" rel="noopener"><span class="mod-name">Descargá tu certificado</span></a>' +
-        '</div>';
+      // Se habilita según el estado real de la evaluación final (final.quiz).
+      var certOn = !!(s.final && s.final.quiz);
+      if (certOn) {
+        html += '<div class="mod mod-single mod-cert mod-cert-cta is-unlocked">' +
+          '<a class="mod-head mod-head-link" href="' + esc(CFG.final.certUrl) + '" target="_blank" rel="noopener">' +
+            '<span class="mod-cert-ic">' + IC.cert + '</span><span class="mod-name">Descargá tu certificado</span>' +
+          '</a></div>';
+      } else {
+        html += '<div class="mod mod-single mod-cert mod-cert-cta is-locked">' +
+          '<span class="mod-head mod-cert-locked" role="link" aria-disabled="true" tabindex="-1" title="Se habilita al marcar la evaluación final como realizada.">' +
+            '<span class="mod-cert-ic">' + IC.cert + '</span><span class="mod-name">Descargá tu certificado</span>' +
+            '<span class="marker">' + IC.lock + '</span>' +
+          '</span></div>';
+      }
     }
 
     html += '</div></div>';

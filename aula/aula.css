@@ -2344,3 +2344,177 @@ body.modal-open{ overflow:hidden; }
   .video-modal{ padding:14px; }
   .video-modal-close{ top:-10px; right:-6px; width:34px; height:34px; font-size:22px; }
 }
+
+/* =========================================================================
+   Ajustes UX Planillas: Promptbook destacado · ícono Búho · CTA certificado
+   ========================================================================= */
+
+/* #3 — Promptbook con mayor jerarquía (dentro de la paleta, sin ser estridente) */
+.mi-promptbook{
+  background:linear-gradient(135deg, var(--mint-light) 0%, #fffaf0 100%);
+  border:1px solid var(--mint);
+  border-left:5px solid var(--yellow);
+}
+.mi-promptbook .mi-pb-ic{ background:#fff; color:var(--mint-strong); box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.mi-promptbook .mi-pb-tx h2{ color:var(--dark-blue); }
+
+/* #6 — ícono de Búho: mismo tamaño/alineación que los demás íconos de recurso */
+.ub-buho-ic svg{ width:22px; height:22px; }
+
+/* #8 — "Descargá tu certificado": CTA final destacado en el sidebar */
+.mod-cert-cta{ margin-top:8px; }
+.mod-cert-cta .mod-head{
+  display:flex; align-items:center; gap:10px;
+  border:2px solid var(--yellow); border-radius:12px;
+  padding:12px 14px; font-weight:700;
+}
+.mod-cert-cta .mod-cert-ic{ display:inline-flex; }
+.mod-cert-cta .mod-cert-ic svg{ width:18px; height:18px; }
+.mod-cert-cta .mod-name{ flex:1 1 auto; }
+.mod-cert-cta .marker{ margin-left:auto; opacity:.85; }
+.mod-cert-cta .marker svg{ width:15px; height:15px; }
+
+/* Habilitado: se comporta como acción principal */
+.mod-cert-cta.is-unlocked .mod-head{
+  background:var(--yellow); color:var(--dark-blue); cursor:pointer;
+}
+.mod-cert-cta.is-unlocked .mod-head:hover{ filter:brightness(1.04); }
+
+/* Bloqueado: mismo lenguaje visual que el resto de contenidos bloqueados */
+.mod-cert-cta.is-locked .mod-cert-locked{
+  background:transparent; color:var(--text-muted, #9aa6b2);
+  cursor:not-allowed;
+}
+.mod-cert-cta.is-locked .mod-cert-ic{ opacity:.6; }
+
+/* Sandbox: identificación de "actividad práctica" */
+.ub-sandbox-label{ display:inline-flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.ub-sandbox-ic{ display:inline-flex; color:var(--mint-strong); }
+.ub-sandbox-ic svg{ width:15px; height:15px; }
+.ub-tag.is-practice{
+  background:var(--mint-light); color:var(--mint-strong);
+  border:1px solid var(--mint);
+}
+/* que el borde del componente refuerce la idea de zona de práctica, sin competir */
+.ub-quick-sandbox{ border-left:3px solid var(--mint); padding-left:14px; }
+
+/* Búho Escribidor: pastilla "Proyecto integrador" (mismo formato que la del Sandbox) */
+.ub-buho-label{ display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ub-tag.is-integrador{
+  background:#e7f0f5; color:var(--dark-blue); border:1px solid var(--blue, #035C80);
+}
+
+/* ============================================================
+   PUNTO 13 — "Mis logros": composición compacta (1 pantalla desktop)
+   Reutiliza .bd-card / .bd-tag / .bd-lock existentes; solo ajusta
+   jerarquía, densidad y encabezado. Sin cambios en la lógica.
+   ============================================================ */
+.bd-compact{ gap:20px; }
+.bd-head{ display:flex; flex-direction:column; gap:14px; }
+.bd-head-top{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+.bd-head-titles .mi-eyebrow{ display:block; }
+.bd-title{ font-size:2rem; line-height:1.05; color:var(--text-main); margin:2px 0 0; font-weight:800; letter-spacing:-.5px; }
+.bd-count-box{ text-align:right; line-height:1.1; }
+.bd-count-num{ display:block; font-size:2rem; font-weight:800; color:var(--dark-blue); }
+.bd-count-num small{ font-size:1.05rem; font-weight:700; color:var(--text-muted); }
+.bd-count-lbl{ display:block; font-size:.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+.bd-progress{ height:9px; border-radius:var(--radius-pill); background:var(--grey-light); overflow:hidden; }
+.bd-progress > span{ display:block; height:100%; border-radius:var(--radius-pill);
+  background:linear-gradient(90deg, var(--mint) 0%, var(--mint-strong) 100%); transition:width .5s ease; }
+.bd-synth{ margin:0; color:var(--text-muted); font-size:.95rem; line-height:1.45; }
+.bd-synth b{ color:var(--text-main); }
+
+/* Grilla compacta: aprovecha el ancho, reduce alto de cada card */
+.bd-grid-compact{ grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:16px; align-content:start; }
+.bd-grid-compact .bd-card{ padding:18px 16px 16px; gap:8px; }
+.bd-grid-compact .bd-img{ width:78px; height:78px; }
+.bd-grid-compact .bd-name{ font-size:1rem; }
+.bd-grid-compact .bd-milestone{ font-size:.8rem; }
+.bd-grid-compact .bd-tag{ margin-top:2px; }
+/* Obtenidas: refuerzo visual claro (borde + halo suave detrás de la insignia) */
+.bd-grid-compact .bd-card[data-state="got"]{ border-color:var(--mint); box-shadow:0 4px 14px rgba(0,0,0,.06); }
+.bd-grid-compact .bd-card[data-state="got"] .bd-img{
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(0,169,138,.16) 0%, rgba(0,169,138,0) 68%);
+}
+/* Bloqueadas: reconocibles como pendientes pero legibles (menos gris que antes) */
+.bd-grid-compact .bd-card[data-state="locked"]{ background:var(--grey-light); border-style:dashed; }
+.bd-grid-compact .bd-card[data-state="locked"] .bd-img img{ filter:grayscale(1); opacity:.55; }
+.bd-grid-compact .bd-card[data-state="locked"] .bd-name{ color:var(--text-main); }
+
+@media (max-width: 640px){
+  .bd-head-top{ align-items:flex-start; }
+  .bd-count-box{ text-align:left; }
+  .bd-grid-compact{ grid-template-columns:1fr 1fr; }
+}
+
+/* ============================================================
+   PUNTOS 14-16 — Evaluación final: estado pendiente y estado
+   "realizada" (cierre). Reutiliza tokens/estilos existentes;
+   compone en tarjetas destacadas y aprovecha el ancho.
+   ============================================================ */
+
+/* --- Estado 1: pendiente (14-15) --- */
+.fn-pending-state{ gap:18px; }
+.fn-start-card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-lg, 20px);
+  box-shadow:var(--shadow); padding:34px 28px 30px; text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.fn-start-card .fn-hero-start{ padding:0; gap:6px; }
+.fn-start-card .fn-congrats{ margin:6px 0 6px; }
+.fn-start-card .fn-hero-desc{ max-width:56ch; }
+.fn-start-cta{
+  margin-top:18px; width:100%; max-width:520px;
+  background:var(--mint-light); border:1px solid var(--mint);
+  border-radius:var(--radius); padding:20px 22px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.fn-start-q{ margin:0; font-size:1.12rem; font-weight:800; color:var(--dark-blue); line-height:1.3; }
+.fn-start-card .fn-start-actions{ margin:0; }
+
+/* --- Estado 2: realizada / cierre (16) --- */
+.fn-done{ gap:0; }
+.fn-done-grid{ display:grid; grid-template-columns:1.15fr .85fr; gap:22px; align-items:stretch; }
+.fn-close-card{
+  background:linear-gradient(160deg, var(--dark-blue) 0%, #16283a 100%);
+  color:#fff; border-radius:var(--radius-lg, 20px); padding:32px 30px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+}
+.fn-close-ic{
+  width:60px; height:60px; border-radius:50%; display:grid; place-items:center;
+  background:rgba(255,205,2,.16); color:var(--yellow, #FFCD02); margin-bottom:4px;
+}
+.fn-close-ic svg{ width:34px; height:34px; }
+.fn-close-card .mi-eyebrow{ color:var(--yellow, #FFCD02); }
+.fn-done-title{ font-size:2rem; line-height:1.08; letter-spacing:-.5px; margin:2px 0 4px; color:#fff; font-weight:800; }
+.fn-done-lead{ font-size:1rem; line-height:1.55; color:rgba(255,255,255,.86); margin:0; max-width:46ch; }
+
+/* Franja de logros dentro del cierre (compacta) */
+.fn-logros-strip{ margin-top:20px; width:100%; border-top:1px solid rgba(255,255,255,.14); padding-top:18px; }
+.fn-logros-lbl{ display:block; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.7); margin-bottom:12px; }
+.fn-close-card .fn-medals{ display:flex; flex-wrap:wrap; gap:16px; }
+.fn-close-card .fn-medal-item{ margin:0; text-align:center; width:74px; }
+.fn-close-card .fn-medal-item img{ width:58px; height:58px; object-fit:contain; filter:drop-shadow(0 6px 12px rgba(0,0,0,.28)); }
+.fn-close-card .fn-medal-item figcaption{ margin-top:6px; font-size:.72rem; font-weight:600; color:rgba(255,255,255,.82); }
+
+/* Tarjeta de certificado */
+.fn-cert-card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius-lg, 20px);
+  box-shadow:var(--shadow); padding:28px 26px; display:flex; flex-direction:column; gap:14px;
+}
+.fn-cert-card .fn-sec-tt{ text-align:left; margin:0; }
+.fn-cert-card .fn-cert-msg{ margin:0; font-size:.98rem; color:var(--text-main); line-height:1.5; }
+.fn-cert-card .fn-cert-preview{ margin:0; }
+.fn-cert-card .fn-cert-actions{ margin-top:4px; display:flex; flex-direction:column; gap:10px; align-items:stretch; }
+.fn-cert-card .fn-cert-btn, .fn-cert-card .btn-ghost.fn-eval-again{ justify-content:center; }
+
+@media (max-width: 860px){
+  .fn-done-grid{ grid-template-columns:1fr; }
+}
+@media (max-width: 640px){
+  .fn-start-card{ padding:26px 18px 24px; }
+  .fn-start-cta{ padding:16px 16px; }
+  .fn-close-card{ padding:26px 20px; }
+  .fn-done-title{ font-size:1.6rem; }
+}

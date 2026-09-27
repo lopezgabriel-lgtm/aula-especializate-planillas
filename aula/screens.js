@@ -11,6 +11,8 @@ window.AulaScreens = (function () {
 
   function qparam(name) { return new URLSearchParams(location.search).get(name); }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  // Claves de unidad presentes en el estado de un módulo (u1, u2, ...). Data-driven.
+  function unitKeysOf(m) { return Object.keys(m || {}).filter(function (k) { return /^u\d+$/.test(k); }); }
 
   /* ----- reglas de estado (derivadas de progress.js) ----- */
   function modUnlocked(s, n) { return AP.moduleUnlocked(s, n); }
@@ -21,7 +23,7 @@ window.AulaScreens = (function () {
     return m['u' + i] ? 'completed' : 'available';
   }
   function moduleXp(mod) { return mod.units.length * 40 + 40; } // 40 por unidad + 40 quiz
-  function moduleUnitsDone(m) { return !!(m.u1 && m.u2 && m.u3 && m.u4); }
+  function moduleUnitsDone(m) { var ks = unitKeysOf(m); return ks.length > 0 && ks.every(function (k) { return m[k]; }); }
   function quizState(s, n) {
     if (!modUnlocked(s, n)) return 'locked';
     var m = s.modules[String(n)];
@@ -46,6 +48,8 @@ window.AulaScreens = (function () {
     lock:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
     info:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
     play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    flask: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6.5L4.6 18a1.5 1.5 0 0 0 1.3 2.3h12.2a1.5 1.5 0 0 0 1.3-2.3L14 9.5V3"/><path d="M7.2 14h9.6"/></svg>',
+    owl:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 1-2 1.3-3.5 1.5C6 4.8 4.5 6.6 4.5 9.5c0 4.2 3.2 7.5 7.5 7.5s7.5-3.3 7.5-7.5c0-2.9-1.5-4.7-4-5C14 4.3 13.2 4 12 3Z"/><circle cx="9" cy="10" r="1.6"/><circle cx="15" cy="10" r="1.6"/><path d="M12 12.2v1.4M10.5 17l-1.2 3M13.5 17l1.2 3"/></svg>',
     download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
     back:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
@@ -145,7 +149,7 @@ window.AulaScreens = (function () {
         '</section>' +
         promptbookCard(mod) +
         '<div class="mi-cta">' +
-          '<div class="mi-note">' + IC.info + '<span>Completá todas las unidades y aprobá el <b>quiz final</b> del módulo para sumar XP y <b>desbloquear el siguiente</b> módulo.</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>Completá todas las unidades y marcá como realizado el <b>cuestionario del módulo</b> (se rinde en Moodle) para sumar XP y <b>desbloquear el siguiente</b> módulo.</span></div>' +
           '<a class="btn btn-complete mi-start" href="unidad.html?m=' + n + '&u=' + startU + '">' + IC.play + ' Comenzar Módulo ' + n + '</a>' +
         '</div>' +
       '</div>';
@@ -198,8 +202,8 @@ window.AulaScreens = (function () {
     return { done: items.filter(resDone).length, total: items.length };
   }
 
-  function openBtn(r) {
-    return '<button type="button" class="ub-open btn" data-open-res="' + esc(r.id) + '" data-url="' + esc(r.url) + '">Abrir ' + IC.ext + '</button>';
+  function openBtn(r, extra) {
+    return '<button type="button" class="ub-open btn" data-open-res="' + esc(r.id) + '" data-url="' + esc(r.url) + '"' + (extra ? ' ' + extra : '') + '>Abrir ' + IC.ext + '</button>';
   }
   function checkDot(r) {
     return resDone(r)
@@ -229,14 +233,15 @@ window.AulaScreens = (function () {
   // Botón de acceso rápido tipado:
   //  · dataset/goldcopy -> descarga directa (sin pestaña)
   //  · video            -> popup (modal)
-  function quickBtn(type, label, url) {
+  function quickBtn(type, label, url, extra) {
+    extra = extra ? (' ' + extra) : '';
     if (type === 'video') {
       var yid = ytId(url);
-      return '<a class="ub-quick-btn ub-quick-video" href="' + esc(url) + '" data-video="' + esc(yid || '') + '" data-video-url="' + esc(url) + '">' + IC.play + ' ' + esc(label) + '</a>';
+      return '<a class="ub-quick-btn ub-quick-video" href="' + esc(url) + '" data-video="' + esc(yid || '') + '" data-video-url="' + esc(url) + '"' + extra + '>' + IC.play + ' ' + esc(label) + '</a>';
     }
     var dl = toDownloadUrl(url);
-    if (dl) return '<a class="ub-quick-btn ub-quick-dl" href="' + esc(dl) + '" data-download="' + esc(dl) + '" download>' + IC.download + ' ' + esc(label) + '</a>';
-    return '<a class="ub-quick-btn" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(label) + ' ' + IC.ext + '</a>';
+    if (dl) return '<a class="ub-quick-btn ub-quick-dl" href="' + esc(dl) + '" data-download="' + esc(dl) + '" download' + extra + '>' + IC.download + ' ' + esc(label) + '</a>';
+    return '<a class="ub-quick-btn" href="' + esc(url) + '" target="_blank" rel="noopener"' + extra + '>' + esc(label) + ' ' + IC.ext + '</a>';
   }
   function quickBtns(map) {
     var b = [];
@@ -271,28 +276,40 @@ window.AulaScreens = (function () {
   }
   // Zona de accesos del Sandbox, dentro del componente de Material de estudio.
   function sandboxQuick(sb) {
-    var b = quickBtns(sb || {});
+    sb = sb || {};
+    // Orden fijo del Sandbox: Dataset -> Video de resolución -> Goldcopy.
+    var b = [];
+    if (sb.dataset)  b.push(quickBtn('dataset', 'Dataset', sb.dataset, 'data-sandbox-resource="dataset"'));
+    if (sb.video)    b.push(quickBtn('video', 'Video de resolución', sb.video, 'data-sandbox-resource="video"'));
+    if (sb.goldcopy) b.push(quickBtn('goldcopy', 'Goldcopy', sb.goldcopy, 'data-sandbox-resource="goldcopy"'));
     if (!b.length) return '';
-    return '<div class="ub-quick ub-quick-sandbox">' +
-      '<span class="ub-quick-label">Accesos del Sandbox</span>' +
+    return '<div class="ub-quick ub-quick-sandbox" data-sandbox>' +
+      '<span class="ub-quick-label ub-sandbox-label">' +
+        '<span class="ub-sandbox-ic">' + IC.flask + '</span>Sandbox ' +
+        '<span class="ub-tag is-practice">Actividad práctica</span>' +
+      '</span>' +
       '<div class="ub-quick-btns">' + b.join('') + '</div></div>';
   }
   // Componente Proyecto integrador — Búho Escribidor (opcional por unidad).
   function buhoBlock(unit) {
     var b = unit.buho; if (!b) return '';
     var main = b.consigna
-      ? '<a class="ub-open btn" href="' + esc(b.consigna) + '" target="_blank" rel="noopener">Abrir consigna ' + IC.ext + '</a>'
+      ? '<a class="ub-open btn" href="' + esc(b.consigna) + '" target="_blank" rel="noopener" data-buho-consigna>Abrir consigna ' + IC.ext + '</a>'
       : '';
-    var links = quickBtns(b);
+    // Orden fijo del Búho: Dataset -> Video de resolución -> Goldcopy (con selectores propios).
+    var links = [];
+    if (b.dataset)  links.push(quickBtn('dataset', 'Dataset', b.dataset, 'data-buho-resource="dataset"'));
+    if (b.video)    links.push(quickBtn('video', 'Video de resolución', b.video, 'data-buho-resource="video"'));
+    if (b.goldcopy) links.push(quickBtn('goldcopy', 'Goldcopy', b.goldcopy, 'data-buho-resource="goldcopy"'));
     var quick = links.length
       ? '<div class="ub-quick"><span class="ub-quick-label">Recursos para resolverlo</span>' +
         '<div class="ub-quick-btns">' + links.join('') + '</div></div>'
       : '';
     return '<div class="ub-block ub-buho is-single">' +
       '<div class="ub-block-head">' +
-        '<span class="ub-block-ic">' + IC.file + '</span>' +
+        '<span class="ub-block-ic ub-buho-ic">' + IC.owl + '</span>' +
         '<div class="ub-block-tt">' +
-          '<div class="ub-block-name">Proyecto integrador — Búho Escribidor <span class="ub-tag is-proj">Proyecto</span></div>' +
+          '<div class="ub-block-name ub-buho-label">Búho Escribidor <span class="ub-tag is-integrador">Proyecto integrador</span></div>' +
           '<div class="ub-item-sub">Consigna del proyecto</div></div>' +
         (main ? '<div class="ub-actions">' + main + '</div>' : '') +
       '</div>' + quick +
@@ -323,7 +340,7 @@ window.AulaScreens = (function () {
         '<div class="ub-block-head">' + ic +
           '<div class="ub-block-tt"><div class="ub-block-name">' + esc(block.category) + ' ' + tagFor(required) + '</div>' +
             '<div class="ub-item-sub">' + esc(r.label) + (r.type ? ' · ' + esc(r.type) : '') + '</div></div>' +
-          '<div class="ub-actions">' + openBtn(r) + checkDot(r) + '</div>' +
+          '<div class="ub-actions">' + openBtn(r, r.sandbox ? 'data-sandbox-consigna' : '') + checkDot(r) + '</div>' +
         '</div>' +
         (r.sandbox ? sandboxQuick(r.sandbox) : '') +
       '</div>';
@@ -638,7 +655,7 @@ window.AulaScreens = (function () {
     var quizCard =
       '<div class="cq-card">' +
         '<span class="cq-card-ic">' + IC.quiz + '</span>' +
-        '<div class="cq-card-tx"><b>Cuestionario del módulo</b><span>Se rinde en Moodle. Al aprobarlo, cerrás el módulo.</span></div>' +
+        '<div class="cq-card-tx"><b>Cuestionario del módulo</b><span>Se rinde en Moodle. Al marcarlo como realizado, cerrás el módulo.</span></div>' +
         (mod.quizUrl ? '<a class="ub-open btn cq-open" href="' + esc(mod.quizUrl) + '" target="_blank" rel="noopener" data-quiz-visit>Ir al cuestionario ' + IC.ext + '</a>' : '') +
       '</div>';
 
@@ -647,7 +664,7 @@ window.AulaScreens = (function () {
       ? (next
           ? '<a class="btn btn-complete" href="modulo.html?m=' + (n + 1) + '">' + IC.arrow + ' Continuar al Módulo ' + (n + 1) + '</a>'
           : '')
-      : '<button type="button" class="btn btn-complete" data-close-module ' + (visited ? '' : 'disabled') + '>' + IC.checkC + ' Marcar como aprobado y cerrar el módulo</button>';
+      : '<button type="button" class="btn btn-complete" data-close-module ' + (visited ? '' : 'disabled') + '>' + IC.checkC + ' Marcar como realizado y cerrar el módulo</button>';
 
     host.innerHTML =
       '<div class="ub">' +
@@ -656,14 +673,14 @@ window.AulaScreens = (function () {
           '<div class="ub-left">' +
             '<span class="mi-eyebrow">Módulo ' + n + ' · Cierre</span>' +
             '<h1 class="mi-title">Cuestionario final</h1>' +
-            '<p class="mi-desc">Es el último paso del módulo. Rendí el cuestionario en Moodle y marcá su aprobación para cerrar el módulo y desbloquear el siguiente.</p>' +
+            '<p class="mi-desc">Es el último paso del módulo. Rendí el cuestionario en Moodle y marcalo como realizado para cerrar el módulo y desbloquear el siguiente.</p>' +
           '</div>' +
           '<div class="ub-right"><div class="cq-badge ' + (done ? 'is-done' : 'is-open') + '">' + (done ? IC.checkC + ' Completado' : IC.quiz + ' Disponible') + '</div></div>' +
         '</div>' +
         quizCard +
         (lastDone ? finalInvite() : '') +
         '<div class="ub-cta">' +
-          '<div class="mi-note">' + IC.info + '<span>' + (done ? 'Cuestionario aprobado. El módulo quedó <b>completado</b>.' : 'Primero <b>abrí el cuestionario</b> en Moodle; después vas a poder marcarlo como aprobado.') + '</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>' + (done ? 'Cuestionario marcado como realizado. El módulo quedó <b>completado</b>.' : 'Primero <b>abrí el cuestionario</b> en Moodle; después vas a poder marcarlo como realizado.') + '</span></div>' +
           '<div class="ub-cta-actions">' + cta + '</div>' +
         '</div>' +
       '</div>';
@@ -704,7 +721,7 @@ window.AulaScreens = (function () {
     var m = s.modules[String(n)];
     if (moduleUnitsDone(m) && m.quiz) return 'completed';
     if (!modUnlocked(s, n)) return 'locked';
-    return (m.u1 || m.u2 || m.u3 || m.u4 || m.quiz) ? 'in-progress' : 'available';
+    return (unitKeysOf(m).some(function (k) { return m[k]; }) || m.quiz) ? 'in-progress' : 'available';
   }
   function prChip(st) {
     if (st === 'completed') return '<span class="pr-chip is-done">' + IC.check + 'Completado</span>';
@@ -723,12 +740,13 @@ window.AulaScreens = (function () {
     var mods = CFG.modules.map(function (mod) {
       var n = mod.n, m = s.modules[String(n)];
       var st = moduleProgressState(s, n);
-      var uDone = ['u1', 'u2', 'u3', 'u4'].filter(function (k) { return m[k]; }).length;
-      var mpct = Math.round((uDone + (m.quiz ? 1 : 0)) / 5 * 100);
+      var uTotal = mod.units.length;
+      var uDone = unitKeysOf(m).filter(function (k) { return m[k]; }).length;
+      var mpct = Math.round((uDone + (m.quiz ? 1 : 0)) / (uTotal + 1) * 100);
       var inner =
         '<div class="pr-mod-tt"><b>Módulo ' + n + '</b><span>' + esc(mod.title) + '</span></div>' +
         '<div class="pr-mod-mid"><div class="pr-mod-bar"><div class="pr-mod-fill" style="width:' + mpct + '%"></div></div>' +
-          '<span class="pr-mod-meta">' + uDone + '/' + m.units.length + ' unidades · Cuestionario ' + (m.quiz ? 'aprobado' : 'pendiente') + '</span></div>' +
+          '<span class="pr-mod-meta">' + uDone + '/' + uTotal + ' unidades · Cuestionario ' + (m.quiz ? 'realizado' : 'pendiente') + '</span></div>' +
         prChip(st);
       return st === 'locked'
         ? '<div class="pr-mod" data-state="locked">' + inner + '</div>'
@@ -767,6 +785,15 @@ window.AulaScreens = (function () {
   function renderBadges(host, s) {
     var list = AP.ACHIEVEMENTS || [];
     var got = list.filter(function (a) { return achUnlocked(a, s); }).length;
+    var total = list.length;
+    var pct = total ? Math.round(got / total * 100) : 0;
+    var nextA = null;
+    for (var i = 0; i < list.length; i++) { if (!achUnlocked(list[i], s)) { nextA = list[i]; break; } }
+    var synth = (got >= total && total > 0)
+      ? 'Conseguiste todas las insignias del recorrido.'
+      : (got === 0
+          ? 'Todavía no obtuviste insignias. Avanzá en el recorrido para desbloquear la primera.'
+          : 'Vas muy bien. Seguí avanzando para desbloquear ' + (nextA ? '<b>' + esc(nextA.name) + '</b>' : 'las que faltan') + '.');
     var cards = list.map(function (a) {
       var on = achUnlocked(a, s);
       return '<div class="bd-card" data-state="' + (on ? 'got' : 'locked') + '">' +
@@ -778,13 +805,22 @@ window.AulaScreens = (function () {
       '</div>';
     }).join('');
     host.innerHTML =
-      '<div class="bd">' +
-        '<header class="pr-hero">' +
-          '<span class="mi-eyebrow">Logros</span>' +
-          '<h1 class="mi-title">Mis logros</h1>' +
-          '<p class="mi-desc">Insignias que vas desbloqueando al avanzar en el recorrido. Llevás <b>' + got + ' de ' + list.length + '</b>.</p>' +
+      '<div class="bd bd-compact">' +
+        '<header class="bd-head">' +
+          '<div class="bd-head-top">' +
+            '<div class="bd-head-titles">' +
+              '<span class="mi-eyebrow">Logros</span>' +
+              '<h1 class="bd-title">Mis logros</h1>' +
+            '</div>' +
+            '<div class="bd-count-box">' +
+              '<span class="bd-count-num">' + got + '<small> / ' + total + '</small></span>' +
+              '<span class="bd-count-lbl">insignias obtenidas</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="bd-progress" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><span style="width:' + pct + '%"></span></div>' +
+          '<p class="bd-synth">' + synth + '</p>' +
         '</header>' +
-        '<div class="bd-grid">' + cards + '</div>' +
+        '<div class="bd-grid bd-grid-compact">' + cards + '</div>' +
       '</div>';
   }
   function initBadges() {
@@ -798,7 +834,8 @@ window.AulaScreens = (function () {
   function allModulesDone(s) {
     return CFG.modules.every(function (mod) {
       var m = s.modules[String(mod.n)];
-      return m.u1 && m.u2 && m.u3 && m.u4 && m.quiz;
+      for (var i = 1; i <= mod.units.length; i++) { if (!m['u' + i]) return false; }
+      return !!m.quiz;
     });
   }
   function finalState(s) {
@@ -838,18 +875,19 @@ window.AulaScreens = (function () {
     }
 
     if (st === 'completed') {
-      // --- Estado 2: cierre del curso ---
+      // --- Estado 2: cierre del recorrido (evaluación final marcada como realizada) ---
+      // No afirma aprobación ni disponibilidad del certificado: eso se valida en Moodle.
       // Mis logros: reutiliza el sistema de insignias (medallas obtenidas con imagen).
       var earned = AP.badges(s).filter(function (b) { return b.earned && b.medal; });
       var logros = earned.length
-        ? '<section class="fn-logros">' +
-            '<h2 class="fn-sec-tt">Mis logros</h2>' +
+        ? '<div class="fn-logros-strip">' +
+            '<span class="fn-logros-lbl">Mis logros</span>' +
             '<div class="fn-medals">' +
               earned.map(function (b) {
                 return '<figure class="fn-medal-item"><img src="' + esc(b.medal) + '" alt="' + esc(b.label) + '" loading="lazy"><figcaption>' + esc(b.label) + '</figcaption></figure>';
               }).join('') +
             '</div>' +
-          '</section>'
+          '</div>'
         : '';
 
       // Preview del certificado (solo referencia visual, con blur). Opcional por curso.
@@ -857,37 +895,35 @@ window.AulaScreens = (function () {
         ? '<div class="fn-cert-preview"><img src="' + esc(F.certPreview) + '" alt="Vista previa del certificado" loading="lazy"><span class="fn-cert-tagfake">Vista previa</span></div>'
         : '';
 
-      // Acción principal: descargar certificado. Secundaria: acceder a la evaluación.
+      // Acción principal: acceder al certificado en Moodle. Secundaria: volver a la evaluación.
       var certReqText = F.certRequirement ||
-        'Para acceder a la certificación necesitás completar y aprobar con un mínimo de 7 los cuestionarios de todos los módulos y el cuestionario final del curso.';
+        'Para certificar necesitás aprobar en Moodle, con un mínimo de 7, los cuestionarios de todos los módulos y el cuestionario final.';
       var certPrimary = F.certUrl
         ? '<a class="btn fn-cert-btn" href="' + esc(F.certUrl) + '" target="_blank" rel="noopener">' + IC.award + ' ' + esc(closing.certLabel) + '</a>'
         : '<span class="fn-pending">Certificado pendiente de configuración.</span>';
-      var evalSecondary = quizBtn('btn btn-ghost fn-eval-again', 'Acceder a la evaluación final', '');
+      var evalSecondary = quizBtn('btn btn-ghost fn-eval-again', 'Acceder a la Evaluación final', '');
 
       host.innerHTML =
         '<div class="fn fn-done">' +
-          '<div class="fn-hero">' +
-            '<span class="fn-medal">' + IC.award + '</span>' +
-            '<span class="mi-eyebrow">Cierre del curso</span>' +
-            '<h1 class="fn-congrats">' + esc(closing.title) + '</h1>' +
-            '<p class="fn-hero-desc">' + esc(closing.message) + '</p>' +
-          '</div>' +
-          logros +
-          '<section class="fn-cert-section">' +
-            '<h2 class="fn-sec-tt">Tu certificado</h2>' +
-            '<div class="fn-cert-wrap">' +
+          '<div class="fn-done-grid">' +
+            '<section class="fn-close-card">' +
+              '<span class="fn-close-ic">' + IC.checkC + '</span>' +
+              '<span class="mi-eyebrow">Cierre del recorrido</span>' +
+              '<h1 class="fn-done-title">Evaluación final realizada</h1>' +
+              '<p class="fn-done-lead">Registramos esta instancia como realizada. La aprobación y la disponibilidad de tu certificado se validan en Moodle.</p>' +
+              logros +
+            '</section>' +
+            '<section class="fn-cert-card">' +
+              '<h2 class="fn-sec-tt">Tu certificado</h2>' +
               preview +
-              '<div class="fn-cert-info">' +
-                '<p class="fn-cert-msg">Tu certificado ya está disponible. Descargalo desde Moodle, con tu cuenta del aula virtual.</p>' +
-                '<div class="fn-cert-actions">' +
-                  '<div class="fn-cert-req">' + IC.info + '<span>' + esc(certReqText) + '</span></div>' +
-                  certPrimary +
-                  evalSecondary +
-                '</div>' +
+              '<p class="fn-cert-msg">Si completaste y aprobaste todos los cuestionarios y la Evaluación final, podés acceder a Moodle para consultar y descargar tu certificado.</p>' +
+              '<div class="fn-cert-req">' + IC.info + '<span>' + esc(certReqText) + '</span></div>' +
+              '<div class="fn-cert-actions">' +
+                certPrimary +
+                evalSecondary +
               '</div>' +
-            '</div>' +
-          '</section>' +
+            '</section>' +
+          '</div>' +
         '</div>';
       return;
     }
@@ -895,23 +931,28 @@ window.AulaScreens = (function () {
     // --- Estado 1: evaluación final pendiente (CTA principal con presencia) ---
     var visited = AP.getResource('final-quiz-visited');
     var mainCta = F.quizUrl
-      ? '<a class="btn fn-start-btn" href="' + esc(F.quizUrl) + '" target="_blank" rel="noopener" data-final-visit>' + IC.arrow + ' Realizar Evaluación final</a>'
+      ? '<a class="btn fn-start-btn" href="' + esc(F.quizUrl) + '" target="_blank" rel="noopener" data-final-visit>' + IC.arrow + ' Accedé acá</a>'
       : '<span class="fn-pending">Falta configurar el enlace del cuestionario final para este curso.</span>';
 
     host.innerHTML =
       '<div class="fn fn-pending-state">' +
         '<a class="ub-back" href="inicio.html">' + IC.back + ' Volver al inicio</a>' +
-        '<div class="fn-hero fn-hero-start">' +
-          '<span class="fn-start-ic">' + IC.quiz + '</span>' +
-          '<span class="mi-eyebrow">Último paso del recorrido</span>' +
-          '<h1 class="fn-congrats">' + esc(F.label || 'Evaluación final') + '</h1>' +
-          '<p class="fn-hero-desc">Llegaste al último desafío del curso. Realizá la evaluación final para completar tu recorrido.</p>' +
-          '<div class="fn-start-actions">' + mainCta + '</div>' +
+        '<div class="fn-start-card">' +
+          '<div class="fn-hero fn-hero-start">' +
+            '<span class="fn-start-ic">' + IC.quiz + '</span>' +
+            '<span class="mi-eyebrow">Último paso del recorrido</span>' +
+            '<h1 class="fn-congrats">' + esc(F.label || 'Evaluación final') + '</h1>' +
+            '<p class="fn-hero-desc">Llegaste al último desafío del curso: es el paso final para completar tu recorrido.</p>' +
+          '</div>' +
+          '<div class="fn-start-cta">' +
+            '<p class="fn-start-q">¿Todavía no realizaste la Evaluación final?</p>' +
+            '<div class="fn-start-actions">' + mainCta + '</div>' +
+          '</div>' +
         '</div>' +
         '<div class="ub-cta fn-approve">' +
-          '<div class="mi-note">' + IC.info + '<span>Cuando la apruebes en Moodle (7 o más), marcala como aprobada para completar tu recorrido y habilitar tu <b>certificado</b>.</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>La evaluación final se rinde en Moodle. Cuando la termines, marcala como realizada para registrar tu avance. Recordá que la aprobación se valida en Moodle.</span></div>' +
           '<div class="ub-cta-actions">' +
-            '<button type="button" class="btn btn-complete" data-approve-final ' + (visited ? '' : 'disabled') + '>' + IC.checkC + ' Marcar evaluación como aprobada</button>' +
+            '<button type="button" class="btn btn-complete" data-approve-final ' + (visited ? '' : 'disabled') + '>' + IC.checkC + ' Marcar evaluación como realizada</button>' +
           '</div>' +
         '</div>' +
       '</div>';

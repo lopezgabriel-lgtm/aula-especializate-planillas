@@ -52,7 +52,8 @@ window.AulaTour = (function () {
       { target: '.mi-chips', title: 'Datos del módulo', text: 'Un resumen rápido: cantidad de unidades, tiempo estimado y la XP que podés sumar en este módulo.' },
       { target: '.mi-video', title: 'Video de introducción', text: 'Arrancá por el video del módulo: te da el panorama general antes de recorrer las unidades.' },
       { target: '.mi-units', title: 'El recorrido del módulo', text: 'Estas son las unidades. Se abren de a una: al completar cada una, se desbloquea la siguiente.' },
-      { target: '.mi-unit-q', title: 'El cierre: el cuestionario', text: 'El cuestionario final es el último paso. Se habilita al completar todas las unidades y, al aprobarlo, cerrás el módulo.' },
+      { target: '.mi-unit-q', title: 'El cierre: el cuestionario', text: 'El cuestionario final es el último paso. Se habilita al completar todas las unidades y, al marcarlo como realizado, cerrás el módulo.' },
+      { target: '.mi-promptbook', title: 'Tu Promptbook', text: 'En cada módulo vas a encontrar un Promptbook: una colección de prompts listos para usar, adaptar y experimentar durante las prácticas. Es un recurso de consulta que te va a acompañar a lo largo del módulo.' },
       { target: '.mi-start', title: 'Comenzá el módulo', text: 'Cuando quieras arrancar, entrá a la primera unidad desde este botón.' }
     ],
 
@@ -65,14 +66,30 @@ window.AulaTour = (function () {
       { target: '.ub-continue', title: 'Seguir avanzando', text: 'Al completar la unidad podés continuar a la siguiente (o, en la última, ir al cuestionario del módulo).' }
     ],
 
+    /* ---------- Proyecto integrador — Búho Escribidor (solo unidades con Búho) ---------- */
+    buho: [
+      { target: '.ub-buho', title: 'Tu Proyecto integrador', text: 'Este proyecto te va a acompañar a lo largo de todo el curso. En cada módulo vas a avanzar una nueva parte y retomar lo que hiciste anteriormente, aplicando los contenidos que vayas aprendiendo. Guardá tu trabajo, porque lo vas a seguir utilizando en los próximos módulos.' },
+      { target: '[data-buho-consigna]', title: 'Empezá por la consigna', text: 'Acá vas a encontrar el desafío, el contexto y las indicaciones de lo que tenés que resolver.' },
+      { target: '[data-buho-resource="dataset"]', title: 'Dataset', text: 'Es el archivo base con los datos que vas a utilizar para resolver el proyecto. Descargalo y trabajá sobre él.' },
+      { target: '[data-buho-resource="video"]', title: 'Video de resolución', text: 'Acá podés ver una forma posible de resolver el proyecto y revisar el proceso paso a paso.' },
+      { target: '[data-buho-resource="goldcopy"]', title: 'Goldcopy', text: 'Es una versión de referencia del proyecto resuelto. Podés utilizarla para comparar tu trabajo y revisar el resultado final.' }
+    ],
+
+    /* ---------- Sandbox (solo la primera unidad que lo tenga) ---------- */
+    sandbox: [
+      { target: '[data-sandbox]', title: 'Momento de practicar', text: 'El Sandbox es un ejercicio práctico para poner a prueba lo que acabás de aprender. Es una actividad puntual de esta unidad: podés experimentar, probar y aplicar el contenido sin que forme parte de tu Proyecto integrador.' },
+      { target: '[data-sandbox-consigna]', title: 'Empezá por la consigna', text: 'Acá vas a encontrar el desafío y las indicaciones para realizar la práctica. Están dentro del material de estudio: revisalas antes de empezar.' },
+      { target: '[data-sandbox] .ub-quick-btns', title: 'Recursos para practicar', text: 'Acá vas a encontrar los materiales que necesitás para resolver el ejercicio. Usalos como punto de partida para hacer la práctica.' }
+    ],
+
     /* ---------- CUESTIONARIO / cierre de módulo (concepto + navegación) ---------- */
     cuestionario: [
-      { target: '.cq-card', title: 'El cierre del módulo', text: 'Este es el último paso del módulo: el cuestionario final. Al aprobarlo, cerrás el módulo y desbloqueás el siguiente.' },
+      { target: '.cq-card', title: 'El cierre del módulo', text: 'Este es el último paso del módulo: el cuestionario final. Al marcarlo como realizado, cerrás el módulo y desbloqueás el siguiente.' },
       { target: '.cq-card', title: 'Se rinde en Moodle', text: 'El cuestionario se realiza en Moodle. Para acceder necesitás estar logueado en tu cuenta del aula virtual. Se abre en una pestaña nueva.' },
-      { target: null, fallback: true, title: 'Cómo se aprueba', text: 'Para aprobar necesitás una calificación de 7 o más. Con esa nota vas a poder marcar el cuestionario como aprobado y cerrar el módulo.' },
+      { target: null, fallback: true, title: 'Cómo se aprueba', text: 'Para aprobar necesitás una calificación de 7 o más en Moodle. Con esa nota, volvé al aula y marcá el cuestionario como realizado para cerrar el módulo.' },
       { target: null, fallback: true, title: 'Si todavía no llegás a 7', text: 'Podés volver a intentarlo las veces que necesites. Te recomendamos aprobar antes de avanzar. Moodle controla la secuencia de los cuestionarios: aunque puedas continuar con algunos contenidos desde esta aula, el siguiente cuestionario permanecerá bloqueado hasta que apruebes el anterior.' },
       { target: null, fallback: true, title: 'La certificación del curso', text: 'Recordá que para acceder a la certificación necesitás tener todos los cuestionarios aprobados. Por eso conviene ir completándolos a medida que avanzás.' },
-      { target: '[data-close-module]', title: 'Cuando lo apruebes', text: 'Una vez que lo apruebes en Moodle (7 o más), marcá acá el cuestionario como aprobado para registrar tu avance, cerrar el módulo y continuar con el siguiente.' },
+      { target: '[data-close-module]', title: 'Cuando termines el cuestionario', text: 'Una vez que completes el cuestionario en Moodle, volvé al aula y marcá esta instancia como realizada para registrar tu avance y continuar con el recorrido.' },
       { target: '[data-tour-open]', title: 'Ayuda siempre a mano', text: 'Podés volver a ver esta guía cuando quieras desde este botón:', demo: '<span class="tour-demo-btn" aria-hidden="true"><span class="tour-demo-q">?</span><span class="tour-demo-tx">Ayuda</span></span>' }
     ]
   };
@@ -107,6 +124,8 @@ window.AulaTour = (function () {
      3) ESTADO DEL TOUR
      ---------------------------------------------------------------------- */
   var scope = 'ruta';
+  var mainScope = 'inicio';   // flujo principal de la página (para el botón Ayuda)
+  var queue = [];      // flujos pendientes a ejecutar en secuencia
   var steps = [];      // pasos válidos (los que tienen elemento o son fallback)
   var idx = 0;
   var active = false;
@@ -282,6 +301,15 @@ window.AulaTour = (function () {
     document.body.classList.remove('tour-open');
     if (els.root) els.root.classList.remove('show');
     markSeen(scope);   // cerrarlo también cuenta como "ya lo vi"
+    runNext();         // si hay otro flujo en cola (p. ej. Búho), arranca
+  }
+  // Arranca los flujos encolados de a uno (saltea los que no tienen pasos visibles).
+  function runNext() {
+    while (queue.length) {
+      scope = queue.shift();
+      start();
+      if (active) return;   // arrancó bien; se seguirá al cerrarse
+    }
   }
 
   function finish() {
@@ -303,7 +331,7 @@ window.AulaTour = (function () {
     }
     if (!btn.__wired) {
       btn.__wired = true;
-      btn.addEventListener('click', function (e) { e.preventDefault(); start(); });
+      btn.addEventListener('click', function (e) { e.preventDefault(); var qq = pageTours(true); if (qq.length) { queue = qq; runNext(); } });
     }
   }
 
@@ -315,30 +343,40 @@ window.AulaTour = (function () {
        - el MÓDULO 1 (primer módulo del recorrido).
      En el resto de los módulos, solo se abre manualmente con el botón "?".
      ---------------------------------------------------------------------- */
-  function init(pageScope) {
-    scope = (['modulo', 'unidad', 'inicio', 'cuestionario'].indexOf(pageScope) >= 0) ? pageScope : 'inicio';
-    ensureHelpButton();
-
+  // Flujos de recorrido relevantes para la página actual.
+  //  all=false -> solo los que aún no se vieron (arranque automático).
+  //  all=true  -> todos los relevantes (botón Ayuda), incluidos Sandbox/Búho de la unidad.
+  function pageTours(all) {
     var seen = loadSeen();
     var q; try { q = new URLSearchParams(window.location.search); } catch (e) { q = { get: function () { return null; } }; }
-    var auto = false;
-
-    if (scope === 'inicio') {
-      auto = !seen.inicio;
-    } else if (scope === 'modulo') {
-      auto = (parseInt(q.get('m'), 10) === 1) && !seen.modulo;   // solo el Módulo 1, una vez
-    } else if (scope === 'unidad') {
-      auto = (parseInt(q.get('m'), 10) === 1 && parseInt(q.get('u'), 10) === 1) && !seen.unidad; // solo la primera unidad
-    } else if (scope === 'cuestionario') {
-      // la primera vez que se ingresa a un cuestionario disponible (si está bloqueado, no arranca solo)
-      auto = !seen.cuestionario && !!document.querySelector('.cq-card');
+    var list = [];
+    if (mainScope === 'inicio') {
+      if (all || !seen.inicio) list.push('inicio');
+    } else if (mainScope === 'modulo') {
+      if (all || ((parseInt(q.get('m'), 10) === 1) && !seen.modulo)) list.push('modulo');
+    } else if (mainScope === 'unidad') {
+      if (all || ((parseInt(q.get('m'), 10) === 1 && parseInt(q.get('u'), 10) === 1) && !seen.unidad)) list.push('unidad');
+      if (document.querySelector('[data-sandbox]') && (all || !seen.sandbox)) list.push('sandbox');
+      if (document.querySelector('.ub-buho') && (all || !seen.buho)) list.push('buho');
+    } else if (mainScope === 'cuestionario') {
+      if ((all || !seen.cuestionario) && document.querySelector('.cq-card')) list.push('cuestionario');
     }
+    return list;
+  }
 
-    if (!auto) return;
+  function init(pageScope) {
+    scope = (['modulo', 'unidad', 'inicio', 'cuestionario'].indexOf(pageScope) >= 0) ? pageScope : 'inicio';
+    mainScope = scope;
+    ensureHelpButton();
+
+    // Cola de flujos a ejecutar automáticamente (solo los que aún no se vieron).
+    var toRun = pageTours(false);
+    if (!toRun.length) return;
 
     setTimeout(function () {
       if (document.body.classList.contains('modal-open')) return; // no pisar un modal (celebración, etc.)
-      start();
+      queue = toRun;
+      runNext();
     }, 900);
   }
 
