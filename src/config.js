@@ -28,17 +28,31 @@ function int(name, def) {
   return Number.isFinite(v) ? v : def;
 }
 function stripSlash(u) { return typeof u === 'string' ? u.replace(/\/+$/, '') : u; }
+// BASE_PATH: prefijo público bajo el que cuelga TODO el gateway (p. ej. /aula/planillas).
+// Se normaliza a "/algo" (sin barra final) o "" si no hay prefijo.
+function normalizeBasePath(v) {
+  var t = String(v || '').trim().replace(/\/+$/, '');
+  if (!t) return '';
+  return t.startsWith('/') ? t : '/' + t;
+}
 
 const NODE_ENV = str('NODE_ENV', 'development');
 const isProd = NODE_ENV === 'production';
 
-const sessionCookieName = str('SESSION_COOKIE_NAME', 'especializate_lti_sid');
+// Nombre propio por aula: iniciación y planillas comparten dominio, y así sus
+// cookies no se pisan ni se confunden (además van acotadas a BASE_PATH).
+const sessionCookieName = str('SESSION_COOKIE_NAME', 'planillas_lti_sid');
+const basePath = normalizeBasePath(str('BASE_PATH', ''));
 
 const config = {
   env: NODE_ENV,
   isProd,
   port: int('PORT', 3000),
+  // Solo el ORIGEN (https://host). La ruta pública va aparte, en BASE_PATH.
   publicBaseUrl: stripSlash(str('PUBLIC_BASE_URL', 'http://localhost:3000')),
+  // Prefijo público de TODAS las rutas del gateway (ej. /aula/planillas). Nginx lo
+  // reenvía sin modificarlo. Vacío = el gateway cuelga de la raíz (desarrollo).
+  basePath,
 
   aula: {
     // Carpeta del aula estática existente (se sirve sin modificar).
@@ -82,21 +96,23 @@ const config = {
     embedInIframe: bool('EMBED_IN_IFRAME', false),
   },
 
-  // Persistencia del progreso. La lógica educativa NO depende de esto:
-  // sólo define dónde persiste el repositorio (caché local vs servidor) y,
-  // en el servidor, qué implementación de store se usa (placeholder por ahora).
+  // Persistencia del progreso. La lógica educativa NO depende de esto.
+  // Ya NO hay caché en el navegador (sin localStorage): el progreso vive en el
+  // servidor y el navegador lo mantiene solo en memoria mientras la página está abierta.
   progress: {
-    // 'local'  → sólo caché en el navegador (idéntico a hoy). Por defecto.
-    // 'remote' → servidor = principal, localStorage = caché.
-    mode: (str('PROGRESS_MODE', 'local') === 'remote') ? 'remote' : 'local',
-    // Implementación del store en el backend: 'memory' | 'file' (placeholders).
+    // 'remote' → el servidor es la fuente de verdad (por defecto).
+    // 'local'  → SIN persistencia: solo memoria del navegador (desarrollo/demo).
+    mode: (str('PROGRESS_MODE', 'remote') === 'local') ? 'local' : 'remote',
+    // Implementación del store en el backend: 'springboot' (producción) | 'memory' | 'file'.
     store: str('PROGRESS_STORE', 'memory'),
-    // Carpeta de datos para el store 'file'.
-    dataDir: path.resolve(PROJECT_ROOT, str('PROGRESS_DATA_DIR', './.data')),
-    // Identificador de curso: aísla el progreso remoto por curso cuando varias
-    // aulas comparten el mismo almacén/origen. Se antepone a la clave del store.
+    // Backend Spring Boot (incluye el contexto, ej. http://localhost:8080/planillas).
+    springBootUrl: stripSlash(str('SPRING_BOOT_URL', '')),
+    internalSecret: str('INTERNAL_API_SECRET', ''),
+    springBootTimeoutMs: int('SPRING_BOOT_TIMEOUT_MS', 5000),
+    // Curso que atiende este gateway (header X-Course-Id). Sin valor por defecto.
     courseId: str('COURSE_ID', ''),
-    endpoint: '/api/progress',
+    dataDir: path.resolve(PROJECT_ROOT, str('PROGRESS_DATA_DIR', './.data')),
+    endpoint: basePath + '/api/progress',
   },
 
   dev: {
@@ -115,14 +131,18 @@ config.cookieBase = {
   httpOnly: true,
   secure: config.isProd || config.session.embedInIframe,
   sameSite: config.session.embedInIframe ? 'none' : 'lax',
-  path: '/',
+  // Acotada al prefijo del aula: no se envía a /aula/iniciacion ni a otras rutas.
+  path: basePath || '/',
 };
+
+// Ruta pública (absoluta, sin origen) de algo que cuelga del gateway.
+config.url = (p) => basePath + p;
 
 // URLs absolutas derivadas (las que se registran en Moodle).
 config.lti.urls = {
-  login: config.publicBaseUrl + config.lti.paths.login,
-  launch: config.publicBaseUrl + config.lti.paths.launch,
-  jwks: config.publicBaseUrl + config.lti.paths.jwks,
+  login: config.publicBaseUrl + basePath + config.lti.paths.login,
+  launch: config.publicBaseUrl + basePath + config.lti.paths.launch,
+  jwks: config.publicBaseUrl + basePath + config.lti.paths.jwks,
 };
 
 /* --------------------------- Validación ------------------------------- */
@@ -144,6 +164,33 @@ export function validateConfig() {
   }
   if (!config.moodleEffectiveUrl) {
     errors.push('Falta MOODLE_URL (o LTI_ISSUER) para los botones "Ir a Moodle".');
+  }
+  try {
+    const u = new URL(config.publicBaseUrl);
+    if (u.pathname !== '/' || u.search || u.hash) {
+      errors.push('PUBLIC_BASE_URL debe ser solo el origen (https://host). La ruta pública va en BASE_PATH.');
+    }
+  } catch {
+    errors.push('PUBLIC_BASE_URL no es una URL válida.');
+  }
+  if (!/^(\/[A-Za-z0-9._~-]+)*$/.test(config.basePath)) {
+    errors.push('BASE_PATH inválido: usá algo como /aula/planillas (sin espacios ni barra final).');
+  }
+  if (config.basePath === '/lti' || config.basePath.startsWith('/lti/')) {
+    errors.push('BASE_PATH no puede estar bajo /lti.');
+  }
+  if (!['springboot', 'memory', 'file'].includes(config.progress.store)) {
+    errors.push('PROGRESS_STORE debe ser springboot, memory o file.');
+  }
+  if (config.progress.store === 'springboot') {
+    if (!config.progress.springBootUrl) errors.push('Falta SPRING_BOOT_URL (PROGRESS_STORE=springboot).');
+    if (!config.progress.courseId) errors.push('Falta COURSE_ID (PROGRESS_STORE=springboot).');
+    if (config.progress.internalSecret.length < 32) {
+      errors.push('INTERNAL_API_SECRET es obligatorio y debe tener al menos 32 caracteres (PROGRESS_STORE=springboot).');
+    }
+  }
+  if (config.isProd && config.progress.mode === 'remote' && config.progress.store !== 'springboot') {
+    errors.push('En producción el progreso debe persistir en el backend: usá PROGRESS_STORE=springboot (memory/file no son durables).');
   }
   if (config.isProd && config.publicBaseUrl.startsWith('http://')) {
     errors.push('En producción PUBLIC_BASE_URL debe ser https:// (las cookies de sesión y OIDC lo requieren).');

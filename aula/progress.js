@@ -32,36 +32,47 @@
 window.AulaProgress = (function () {
   'use strict';
 
-  function courseSlug() { var c = window.COURSE_CONFIG; return (c && c.slug) ? String(c.slug) : 'ia'; }
-  var STORAGE_KEY = 'especializate_' + courseSlug() + '_progress_v2';
-  // Clave del onboarding (la usa tour.js). Se declara acá solo para poder
-  // limpiarla en reset(): "borrar el avance" también reinicia la ayuda guiada.
-  var ONBOARDING_KEY = 'especializate_ia_onboarding_v1';
-  // Registra que el estudiante ENTRÓ al cuestionario de un módulo (no valida
+  // Versión del formato del documento de progreso. Viaja dentro del documento y el
+  // gateway la envía al backend. v2 = incorpora quizVisited, matVisited y tourSeen
+  // (antes vivían en claves sueltas del navegador).
+  var SCHEMA_VERSION = 2;
+
+  // TODO el estado del estudiante vive en UN documento (state) que se persiste en el
+  // servidor (ver progress.repository.js). No se usa ningún almacenamiento del navegador.
+
+  // Marca que el estudiante ENTRÓ al cuestionario de un módulo (no valida
   // aprobación: eso vive en Moodle). Habilita el botón "Completar módulo".
-  var QUIZVISIT_KEY = 'especializate_' + courseSlug() + '_quizvisited_v1';
-  function loadQuizVisited() {
-    try { var r = window.localStorage.getItem(QUIZVISIT_KEY); return r ? JSON.parse(r) : {}; }
-    catch (e) { return {}; }
-  }
-  function quizVisited(num) { return !!loadQuizVisited()[String(num)]; }
+  // state.quizVisited = { "<n>": true }
+  function quizVisited(num) { return !!load().quizVisited[String(num)]; }
   function markQuizVisited(num) {
-    try { var o = loadQuizVisited(); o[String(num)] = true; window.localStorage.setItem(QUIZVISIT_KEY, JSON.stringify(o)); }
-    catch (e) {}
+    var s = load(), k = String(num);
+    if (s.quizVisited[k]) return;
+    s.quizVisited[k] = true; save(s);
   }
 
   // Registra el acceso al "Material de estudio" de CADA unidad, por separado
   // (clave "modulo.unidad", p. ej. "1.u2"). Habilita marcar esa unidad como
   // completada. Visitar el material de una unidad NO habilita el de las demás.
-  var MATVISIT_KEY = 'especializate_' + courseSlug() + '_matvisited_v1';
-  function loadMatVisited() {
-    try { var r = window.localStorage.getItem(MATVISIT_KEY); return r ? JSON.parse(r) : {}; }
-    catch (e) { return {}; }
-  }
-  function matVisited(num, uKey) { return !!loadMatVisited()[String(num) + '.' + uKey]; }
+  // state.matVisited = { "<n>.<uX>": true }
+  function matVisited(num, uKey) { return !!load().matVisited[String(num) + '.' + uKey]; }
   function markMatVisited(num, uKey) {
-    try { var o = loadMatVisited(); o[String(num) + '.' + uKey] = true; window.localStorage.setItem(MATVISIT_KEY, JSON.stringify(o)); }
-    catch (e) {}
+    var s = load(), k = String(num) + '.' + uKey;
+    if (s.matVisited[k]) return;
+    s.matVisited[k] = true; save(s);
+  }
+
+  // Product tour (tour.js): qué flujos de ayuda ya vio el estudiante.
+  // state.tourSeen = { inicio: true, modulo: true, ... }
+  function getTourSeen() { var o = load().tourSeen, c = {}; Object.keys(o).forEach(function (k) { c[k] = true; }); return c; }
+  function markTourSeen(scope) {
+    var s = load(), k = String(scope);
+    if (s.tourSeen[k]) return;
+    s.tourSeen[k] = true; save(s);
+  }
+  function resetTour() {
+    var s = load();
+    if (!Object.keys(s.tourSeen).length) return;
+    s.tourSeen = {}; save(s);
   }
 
   var UNIT_XP   = 40;   // cada unidad (4 unidades × 40 = 160)
@@ -125,43 +136,49 @@ window.AulaProgress = (function () {
       // Insignias gamificadas: guarda qué modales de felicitación ya se mostraron
       // (el "desbloqueo" en sí se deriva del progreso; esto evita repetir el modal).
       achievements: { seen: { iniciante: false, explorador: false, arquitecto: false, experto: false } },
+      // "Ya entró" al cuestionario de cada módulo / al material de cada unidad, y
+      // flujos del tour ya vistos. Aditivos: NO afectan XP ni %.
+      quizVisited: {},
+      matVisited: {},
+      tourSeen: {},
       xp: 0,
+      schemaVersion: SCHEMA_VERSION,
       lastUpdated: ''
     };
   }
 
   /* ----------------------------------------------------------------------
-     3) ALMACENAMIENTO (con fallback en memoria si localStorage no está
-        disponible, p. ej. algunos navegadores al abrir con file://)
+     3) ALMACENAMIENTO — sin localStorage
+        El estado se lee/escribe de forma SÍNCRONA a través del ProgressRepository
+        (window.AulaProgressRepo), que lo mantiene en memoria y lo sincroniza con el
+        servidor en segundo plano. Antes de dibujar, cada página espera a que el
+        repositorio traiga el progreso: ver whenReady().
+        Si el repositorio no está (p. ej. se abrió la carpeta del aula como archivos
+        estáticos, sin gateway), el estado queda solo en memoria y NO se persiste.
      ---------------------------------------------------------------------- */
   var memoryStore = null;
 
-  function storageAvailable() {
-    try {
-      var t = '__aula_test__';
-      window.localStorage.setItem(t, '1');
-      window.localStorage.removeItem(t);
-      return true;
-    } catch (e) { return false; }
-  }
-  // Acceso a la CACHÉ LOCAL. Si existe un ProgressRepository (capa de
-  // persistencia desacoplada), delega en él; si no, usa localStorage como
-  // siempre. La lógica educativa no cambia: sigue leyendo/escribiendo de forma
-  // síncrona. El repositorio se encarga, aparte y en segundo plano, de
-  // sincronizar con el servidor (persistencia principal). Ver progress.repository.js.
   function readRaw() {
     var repo = window.AulaProgressRepo;
     if (repo && typeof repo.loadLocal === 'function') {
-      try { return repo.loadLocal(); } catch (e) { /* cae al fallback */ }
+      try { return repo.loadLocal(); } catch (e) { /* cae a memoria */ }
     }
-    return storageAvailable() ? window.localStorage.getItem(STORAGE_KEY) : memoryStore;
+    return memoryStore;
   }
   function writeRaw(str) {
     var repo = window.AulaProgressRepo;
     if (repo && typeof repo.saveLocal === 'function') {
-      try { repo.saveLocal(str); return; } catch (e) { /* cae al fallback */ }
+      try { repo.saveLocal(str); return; } catch (e) { /* cae a memoria */ }
     }
-    if (storageAvailable()) window.localStorage.setItem(STORAGE_KEY, str); else memoryStore = str;
+    memoryStore = str;
+  }
+
+  // Ejecuta fn cuando el progreso ya se cargó del servidor. Sin repositorio
+  // (vista estática), ejecuta fn enseguida. Todas las páginas lo usan para dibujarse.
+  function whenReady(fn) {
+    var repo = window.AulaProgressRepo;
+    if (repo && repo.ready && typeof repo.ready.then === 'function') repo.ready.then(function () { fn(); });
+    else fn();
   }
 
   /* Combina lo guardado con el default (tolerante a cambios de estructura) */
@@ -191,7 +208,16 @@ window.AulaProgress = (function () {
         if (typeof saved.resources[k] === 'boolean') base.resources[k] = saved.resources[k];
       });
     }
+    ['quizVisited', 'matVisited', 'tourSeen'].forEach(function (f) { mergeFlagMap(base[f], saved[f]); });
     return base;
+  }
+  // Copia solo banderas verdaderas con claves "razonables" (acota tamaño y basura).
+  function mergeFlagMap(target, src) {
+    if (!src || typeof src !== 'object' || Array.isArray(src)) return;
+    var n = 0;
+    Object.keys(src).forEach(function (k) {
+      if (src[k] === true && /^[A-Za-z0-9._-]{1,40}$/.test(k) && n < 200) { target[k] = true; n++; }
+    });
   }
 
   function load() {
@@ -354,10 +380,19 @@ window.AulaProgress = (function () {
     ['iniciante', 'explorador', 'arquitecto', 'experto'].forEach(function (k) {
       target.achievements.seen[k] = target.achievements.seen[k] || src.achievements.seen[k];
     });
+    // quizVisited / matVisited / tourSeen: unión (OR), igual que el resto.
+    ['quizVisited', 'matVisited', 'tourSeen'].forEach(function (f) {
+      Object.keys(src[f] || {}).forEach(function (k) { if (src[f][k]) target[f][k] = true; });
+    });
   }
   function completedSet(state) {
     var set = {};
     GRANULAR.forEach(function (g) { if (getFlag(state, g.id)) set[g.id] = true; });
+    // Las banderas de visitado y del tour también cuentan para saber si falta subir
+    // o bajar algo (prefijos para que no choquen con los ids del recorrido).
+    [['quizVisited', 'qv.'], ['matVisited', 'mv.'], ['tourSeen', 'tour.']].forEach(function (p) {
+      Object.keys(state[p[0]] || {}).forEach(function (k) { if (state[p[0]][k]) set[p[1] + k] = true; });
+    });
     return set;
   }
   function isSubset(a, b) { // ¿todo lo de a está en b?
@@ -462,7 +497,7 @@ window.AulaProgress = (function () {
      FUNCIÓN ÚNICA DE COMPLETADO DE MÓDULO
      Se ejecuta al marcar el módulo como completado (botón "Completar").
      Es la única responsable de: guardar el progreso, sumar experiencia,
-     desbloquear el módulo siguiente y las insignias, y actualizar localStorage.
+     desbloquear el módulo siguiente y las insignias, y persistir el progreso.
      El desbloqueo de módulos/insignias se deriva del estado (ver isUnlocked /
      moduleUnlocked / ACHIEVEMENTS), por eso alcanza con marcar y guardar.
      NO depende de "Volver a la ruta": el avance queda firme apenas se llama.
@@ -474,20 +509,17 @@ window.AulaProgress = (function () {
     // Requiere las 4 unidades hechas (contenido del módulo)
     if (!moduleUnitsDone(mod)) return s;
     setFlag(s, 'modules.' + num + '.quiz', true); // cierra el módulo (4 unidades + cuestionario)
-    save(s); // save() recalcula XP y el certificado, y persiste en localStorage
+    save(s); // save() recalcula XP y el certificado, y lo persiste (repositorio → servidor)
     return s;
   }
   function reset() {
-    try { if (storageAvailable()) window.localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    memoryStore = null;
-    // "Volver a empezar" = experiencia de estudiante nuevo: también se olvida el
-    // onboarding, para que el product tour vuelva a mostrarse automáticamente
-    // (la ayuda vive en su propia clave, ver tour.js).
-    try { if (storageAvailable()) window.localStorage.removeItem(ONBOARDING_KEY); } catch (e) {}
-    try { if (storageAvailable()) window.localStorage.removeItem(QUIZVISIT_KEY); } catch (e) {}
-    try { if (storageAvailable()) window.localStorage.removeItem(MATVISIT_KEY); } catch (e) {}
-    try { if (window.AulaTour && window.AulaTour.reset) window.AulaTour.reset(); } catch (e) {}
-    return defaultState();
+    // "Volver a empezar" = experiencia de estudiante nuevo: se guarda el estado vacío
+    // (incluye tourSeen, visitados y progreso), y el repositorio lo persiste en el servidor.
+    var s = defaultState();
+    recompute(s); delete s.__healed;
+    s.lastUpdated = new Date().toISOString();
+    try { writeRaw(JSON.stringify(s)); } catch (e) {}
+    return s;
   }
 
   /* ======================================================================
@@ -571,7 +603,7 @@ window.AulaProgress = (function () {
      desbloquean al alcanzar ciertos hitos del recorrido. Cada una:
        - tiene estado bloqueado (gris/opaco) y desbloqueado (a color, con brillo);
        - al desbloquearse por primera vez dispara un modal de felicitación;
-       - el "ya vi el modal" se guarda en localStorage (state.achievements.seen)
+       - el "ya vi el modal" se guarda en el documento de progreso (state.achievements.seen)
          para no repetirlo tras recargar la página.
      ====================================================================== */
 
@@ -650,7 +682,7 @@ window.AulaProgress = (function () {
     });
   }
 
-  /* --- 8-bis.3) GUARDADO EN localStorage ------------------------------- */
+  /* --- 8-bis.3) GUARDADO (documento de progreso) ----------------------- */
   // Marca el modal de una insignia como ya mostrado y persiste el estado.
   function markCelebrationSeen(id) {
     var s = load();
@@ -1413,7 +1445,7 @@ window.AulaProgress = (function () {
           return;
         }
         if (moduleComplete(s.modules[String(num)])) return; // ya estaba completo
-        completeModule(num); // guarda progreso, suma XP, desbloquea módulo e insignias, actualiza localStorage
+        completeModule(num); // guarda progreso, suma XP, desbloquea módulo e insignias y persiste el progreso
         renderModuleState();
         var msg = document.querySelector('[data-completed-msg]');
         if (msg) { msg.hidden = false; if (msg.focus) msg.focus(); }
@@ -1753,13 +1785,17 @@ window.AulaProgress = (function () {
      API pública
      ---------------------------------------------------------------------- */
   return {
-    STORAGE_KEY: STORAGE_KEY,
+    SCHEMA_VERSION: SCHEMA_VERSION,
     GRANULAR: GRANULAR,
     TOTAL_XP: TOTAL_XP,
     TOTAL_STEPS: TOTAL_STEPS,
     MODULE_META: MODULE_META,
     // estado
     load: load, save: save, reset: reset,
+    // las páginas esperan a que el progreso llegue del servidor antes de dibujarse
+    whenReady: whenReady,
+    // product tour: flujos ya vistos (viajan dentro del documento de progreso)
+    getTourSeen: getTourSeen, markTourSeen: markTourSeen, resetTour: resetTour,
     // reconciliación pura para la sincronización (la usa ProgressRepository)
     reconcile: reconcile,
     // mutación

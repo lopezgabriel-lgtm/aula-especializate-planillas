@@ -13,7 +13,8 @@
    `studentKey` SIEMPRE lo provee el servidor desde la sesión LTI
    (req.session.lti.stableId). Nunca viene del navegador.
 
-   Se incluyen dos implementaciones PLACEHOLDER para poder correr ya:
+   Implementación de PRODUCCIÓN: SpringBootProgressStore (springBootStore.js).
+   Además, dos implementaciones PLACEHOLDER para desarrollo:
      • MemoryProgressStore → se pierde al reiniciar. Sólo para desarrollo/demo.
      • FileProgressStore    → un archivo JSON por estudiante. Durable en una sola
                               instancia. Útil para pilotos chicos, no para escala.
@@ -21,6 +22,7 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import { SpringBootProgressStore } from './springBootStore.js';
 
 /** Implementación en memoria (volátil). */
 export class MemoryProgressStore {
@@ -68,6 +70,12 @@ export class FileProgressStore {
 /** Fábrica: elige la implementación según config. */
 export function createProgressStore(progressCfg) {
   switch (progressCfg.store) {
+    case 'springboot': return new SpringBootProgressStore({
+      baseUrl: progressCfg.springBootUrl,
+      secret: progressCfg.internalSecret,
+      courseId: progressCfg.courseId,
+      timeoutMs: progressCfg.springBootTimeoutMs,
+    });
     case 'file': return new FileProgressStore(progressCfg.dataDir);
     case 'memory':
     default: return new MemoryProgressStore();

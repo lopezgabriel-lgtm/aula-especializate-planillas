@@ -11,12 +11,15 @@
         "Tu sesión finalizó" (nunca muestra usuario/contraseña).
 
    No guarda ningún token en localStorage/sessionStorage ni en variables JS.
+   Todas las URLs cuelgan del prefijo del aula (window.__AULA_BASE__).
    ========================================================================= */
 (function () {
   'use strict';
 
-  var ME_URL = '/api/me';
-  var EXPIRED_PAGE = '/sesion-finalizada.html';
+  // Prefijo público del aula (p. ej. /aula/planillas), inyectado por el gateway.
+  var BASE = window.__AULA_BASE__ || '';
+  var ME_URL = BASE + '/api/me';
+  var EXPIRED_PAGE = BASE + '/sesion-finalizada.html';
   var RECHECK_MS = 2 * 60 * 1000; // revalida cada 2 min y al volver el foco
   var wasAuthenticated = false;
 

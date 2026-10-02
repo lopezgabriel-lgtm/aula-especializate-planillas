@@ -1,6 +1,6 @@
 # Aula virtual — Introducción a la IA (especIAlizate)
 
-Aula gamificada con **avance secuencial**, **XP**, **insignias** y progreso guardado en `localStorage`.
+Aula gamificada con **avance secuencial**, **XP**, **insignias** y progreso guardado en el servidor (sin `localStorage`).
 La interfaz es **data-driven**: el contenido vive en un único archivo (`course.config.js`) y las pantallas se
 arman solas a partir de él. Para clonar el aula a otro curso, en principio alcanza con editar ese archivo.
 
@@ -87,13 +87,18 @@ el boton flotante **"?"**. Hay 4 recorridos (scopes): **inicio**, **modulo**, **
 (este ultimo explica la nota minima, los reintentos, Moodle y la certificacion). Los textos y pasos se editan en el
 objeto `STEPS` de `tour.js`.
 
-## Persistencia (claves de `localStorage`)
-- `especializate_ia_progress_v2` - progreso, XP, insignias, y el tracking por recurso.
-- `especializate_ia_shell_v1` - preferencia del sidebar (colapsado).
-- `especializate_ia_onboarding_v1` - "ya vi el tour" por pantalla.
+## Persistencia (sin `localStorage`)
+El navegador no guarda nada. Todo el estado del estudiante es **un documento** (`progress.js`) que el gateway
+persiste en el servidor (`aula-client/progress.repository.js` → `/api/progress` → Spring Boot):
+- Progreso, XP, insignias y tracking por recurso (como siempre).
+- `quizVisited` / `matVisited` - "ya entro" al cuestionario de un modulo / al material de una unidad.
+- `tourSeen` - "ya vi el tour" por pantalla.
+- `schemaVersion: 2` - version del formato del documento.
+El sidebar colapsado vive solo en memoria. Cada pagina se dibuja dentro de `AulaProgress.whenReady(...)`
+(espera a que el progreso llegue del servidor); si agregas una pagina nueva, hacé lo mismo.
 
 ## Como probar / reiniciar
-Servir la carpeta con un servidor local (para que `localStorage` y los videos funcionen sin friccion):
+Servir la carpeta con un servidor local (para que los videos funcionen sin friccion). **Sin el gateway no se persiste nada** (todo queda en memoria, sirve para revisar contenido):
 ```
 cd "Introduccion a la IA"
 python3 -m http.server 8000

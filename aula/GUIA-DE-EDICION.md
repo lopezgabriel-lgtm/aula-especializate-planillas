@@ -6,10 +6,9 @@ Las pantallas se arman solas a partir de el. **No hay que editar HTML por modulo
 > Regla de oro: para cambiar contenido, editas `course.config.js`. La logica (desbloqueos, XP, insignias)
 > vive en `progress.js` y normalmente **no se toca**.
 
-> **Sobre las dos versiones del proyecto.** Existe una version con **localStorage** (respaldo) y otra con
-> **backend** (persistencia centralizada del progreso). La edicion de contenido es **identica en las dos**:
-> en ambas se edita `aula/course.config.js`. Lo unico que cambia entre versiones es donde se guarda el avance
-> del alumno, no como se cargan los contenidos.
+> **Sobre la persistencia.** Esta version guarda el avance del alumno **en el servidor** (backend Spring Boot), sin
+> `localStorage`. La edicion de contenido no cambia: se edita `aula/course.config.js`. Lo unico que cambia es donde
+> se guarda el avance del alumno, no como se cargan los contenidos.
 
 ---
 
@@ -149,7 +148,7 @@ final: {
   su avance en el aula. La secuencia y la correccion real las controla **Moodle**.
 
 ## 7. Clonar el aula a OTRO curso
-1. Copia toda la carpeta del proyecto (la version que uses: localStorage o backend).
+1. Copia toda la carpeta del proyecto.
 2. Edita `aula/course.config.js`: `name`, `logo`, los 3 recursos de `intro`, los `modules` (titulos, videos,
    quizUrl, objetivos y las `units` con sus `resources`) y el `final`.
 3. Reemplaza las imagenes de `aula/img/` si corresponde (logo e insignias).
@@ -176,7 +175,7 @@ su boton lleva al recorrido (`inicio.html`).
 
 > Para una **vista rapida solo del contenido** (sin LTI ni sesion) podes abrir el aula como estatico apuntando un
 > servidor simple a la carpeta `aula/` (`cd aula && python3 -m http.server 8000` -> `index.html`). En ese modo
-> el progreso queda en localStorage y no hay identidad de alumno; sirve para revisar textos y recursos.
+> el progreso NO se guarda (queda solo en memoria) y no hay identidad de alumno; sirve para revisar textos y recursos.
 
 ## 10. Checklist antes de publicar
 - [ ] `name`, `logo` y los 3 recursos de `intro` cargados (videos/PDF reales, no placeholders) con `required` segun corresponda.

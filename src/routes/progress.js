@@ -29,10 +29,18 @@ router.use(requireSession);
 
 // Identidad del estudiante: SIEMPRE desde la sesión, nunca del cliente.
 function studentKey(req) {
-  // Identidad SIEMPRE desde la sesión; se antepone el curso (config) para aislar
-  // el progreso por curso cuando varias aulas comparten almacén.
-  var cid = config.progress.courseId;
-  return (cid ? cid + ':' : '') + req.session.lti.stableId;
+  // Identidad SIEMPRE desde la sesión. La clave es el hash estable (issuer +
+  // deployment_id + sub), sin prefijo de curso: el curso viaja aparte
+  // (X-Course-Id) y cada aula tiene su propio backend y su propia base.
+  return req.session.lti.stableId;
+}
+
+// Mapea un fallo del store a la respuesta HTTP que ve el navegador.
+function storeFailure(res, e) {
+  if (e && e.code === 'store_unavailable') {
+    return res.status(503).json({ error: 'almacenamiento_no_disponible' });
+  }
+  return res.status(500).json({ error: 'store_error' });
 }
 
 router.get('/api/progress', async (req, res) => {
@@ -44,7 +52,7 @@ router.get('/api/progress', async (req, res) => {
       updatedAt: rec ? rec.updatedAt : null,
     });
   } catch (e) {
-    return res.status(500).json({ error: 'store_error' });
+    return storeFailure(res, e);
   }
 });
 
@@ -65,7 +73,7 @@ router.put('/api/progress', async (req, res) => {
     const { updatedAt } = await store.put(studentKey(req), doc);
     return res.json({ ok: true, updatedAt });
   } catch (e) {
-    return res.status(500).json({ error: 'store_error' });
+    return storeFailure(res, e);
   }
 });
 
