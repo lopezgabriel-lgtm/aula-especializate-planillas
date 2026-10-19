@@ -6,22 +6,23 @@
    - Lee el estado desde progress.js (AulaProgress): NO duplica la lógica de
      avance; solo la refleja. progress.js sigue siendo la fuente de verdad.
    - Toma el contenido (nombre, recursos, módulos, unidades) de course.config.js.
-   - No toca la clave de progreso: su propia preferencia (colapsado) va en una
-     clave aparte.
+   - Sin almacenamiento del navegador: la preferencia de colapsado vive solo en
+     memoria (se reinicia al cambiar de página).
+   - Se monta recién cuando el progreso ya se cargó del servidor (AP.whenReady).
    ========================================================================= */
 window.AulaShell = (function () {
   'use strict';
   var AP  = window.AulaProgress;
   var CFG = window.COURSE_CONFIG;
-  var PREF_KEY = 'especializate_' + ((window.COURSE_CONFIG && window.COURSE_CONFIG.slug) || 'ia') + '_shell_v1';
 
   /* ---------- utilidades DOM ---------- */
   function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  /* ---------- preferencia (colapsado) en su propia clave ---------- */
-  function loadPref() { try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch (e) { return {}; } }
-  function savePref(p) { try { localStorage.setItem(PREF_KEY, JSON.stringify(p)); } catch (e) {} }
+  /* ---------- preferencia (colapsado): solo en memoria ---------- */
+  var pref = {};
+  function loadPref() { return pref; }
+  function savePref(p) { pref = p; }
 
   /* ---------- reglas de estado (derivadas de progress.js) ----------
      Se leen del mismo snapshot de estado; las de módulo usan la función
@@ -437,10 +438,11 @@ window.AulaShell = (function () {
     render();
   }
 
-  /* auto-init */
+  /* auto-init: espera al DOM y a que el progreso se haya cargado del servidor */
   function init() {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
-    else mount();
+    function go() { AP.whenReady(mount); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+    else go();
   }
   init();
 

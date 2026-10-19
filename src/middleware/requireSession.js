@@ -28,5 +28,5 @@ export function requireSession(req, res, next) {
   }
 
   // Navegaciones normales: redirigir a la pantalla adecuada.
-  return res.redirect(302, hadSession ? '/sesion-finalizada.html' : '/acceso.html');
+  return res.redirect(302, config.url(hadSession ? '/sesion-finalizada.html' : '/acceso.html'));
 }
