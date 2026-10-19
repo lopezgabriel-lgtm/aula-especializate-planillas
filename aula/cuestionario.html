@@ -40,10 +40,10 @@
   <script src="course.config.js"></script>
   <script src="progress.js"></script>
   <script src="screens.js"></script>
-  <script>AulaScreens.initCuestionario();</script>
+  <script>AulaProgress.whenReady(function () { AulaScreens.initCuestionario(); });</script>
   <script src="shell.js"></script>
   <!-- Ayuda guiada (product tour) -->
   <script src="tour.js"></script>
-  <script>AulaTour.init('cuestionario');</script>
+  <script>AulaProgress.whenReady(function () { AulaTour.init('cuestionario'); });</script>
 </body>
 </html>

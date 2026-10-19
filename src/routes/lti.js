@@ -54,7 +54,7 @@ if (config.dev.fakeLaunch) {
         res.cookie(config.session.seenCookieName, '1', {
           ...config.cookieBase, maxAge: config.session.seenTtlMs,
         });
-        res.redirect(302, config.aula.entry);
+        res.redirect(302, config.url(config.aula.entry));
       });
     });
   });

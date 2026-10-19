@@ -24,11 +24,11 @@
   <script src="course.config.js"></script>
   <script src="progress.js"></script>
   <script src="screens.js"></script>
-  <script>AulaScreens.initModulo();</script>
+  <script>AulaProgress.whenReady(function () { AulaScreens.initModulo(); });</script>
   <!-- App-shell: sidebar + header -->
   <script src="shell.js"></script>
   <!-- Ayuda guiada (product tour) -->
   <script src="tour.js"></script>
-  <script>AulaTour.init('modulo');</script>
+  <script>AulaProgress.whenReady(function () { AulaTour.init('modulo'); });</script>
 </body>
 </html>

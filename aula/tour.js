@@ -3,7 +3,9 @@
    Aula gamificada "Introducción a la IA" — Especializate
    -------------------------------------------------------------------------
    Capa de AYUDA GUIADA, independiente de la lógica de avance (progress.js).
-   No lee ni escribe el progreso del estudiante: solo guarda si ya vio el tour.
+   No lee ni escribe el avance del estudiante: solo registra qué flujos de ayuda ya
+   vio (AulaProgress.getTourSeen / markTourSeen), que viaja dentro del documento de
+   progreso y se guarda en el servidor. Sin almacenamiento del navegador.
 
    Dónde corre:
      - ruta.html        -> tour de la RUTA (se muestra automático la 1ª vez)
@@ -19,13 +21,11 @@
      start()      -> inicia el tour manualmente
      stop()       -> cierra el tour
      reset()      -> olvida el "ya lo vi" (para volver a probarlo)
+   Llamar a init() DENTRO de AulaProgress.whenReady (para que ya estén cargados los "vistos").
    ========================================================================= */
 
 window.AulaTour = (function () {
   'use strict';
-
-  /* Clave propia: NO toca la clave del progreso (especializate_ia_progress_v2) */
-  var TOUR_KEY = 'especializate_' + ((window.COURSE_CONFIG && window.COURSE_CONFIG.slug) || 'ia') + '_onboarding_v1';
 
   /* ----------------------------------------------------------------------
      1) PASOS DEL TOUR
@@ -95,29 +95,19 @@ window.AulaTour = (function () {
   };
 
   /* ----------------------------------------------------------------------
-     2) PERSISTENCIA (solo del "ya vi el tour") — con fallback en memoria
+     2) PERSISTENCIA (solo del "ya vi el tour")
+        Viaja dentro del documento de progreso (state.tourSeen) a través de
+        AulaProgress; el repositorio lo guarda en el servidor. Nada en el navegador.
      ---------------------------------------------------------------------- */
-  var memory = null;
-  function storageOk() {
-    try {
-      var t = '__tour__'; window.localStorage.setItem(t, '1'); window.localStorage.removeItem(t); return true;
-    } catch (e) { return false; }
-  }
   function loadSeen() {
-    try {
-      var raw = storageOk() ? window.localStorage.getItem(TOUR_KEY) : memory;
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) { return {}; }
+    try { return (window.AulaProgress && window.AulaProgress.getTourSeen) ? window.AulaProgress.getTourSeen() : {}; }
+    catch (e) { return {}; }
   }
   function markSeen(scope) {
-    var s = loadSeen();
-    s[scope] = true;
-    var str = JSON.stringify(s);
-    try { if (storageOk()) window.localStorage.setItem(TOUR_KEY, str); else memory = str; } catch (e) {}
+    try { if (window.AulaProgress && window.AulaProgress.markTourSeen) window.AulaProgress.markTourSeen(scope); } catch (e) {}
   }
   function reset() {
-    try { if (storageOk()) window.localStorage.removeItem(TOUR_KEY); } catch (e) {}
-    memory = null;
+    try { if (window.AulaProgress && window.AulaProgress.resetTour) window.AulaProgress.resetTour(); } catch (e) {}
   }
 
   /* ----------------------------------------------------------------------
@@ -385,7 +375,6 @@ window.AulaTour = (function () {
     start: start,
     stop: stop,
     reset: reset,
-    STEPS: STEPS,
-    TOUR_KEY: TOUR_KEY
+    STEPS: STEPS
   };
 })();

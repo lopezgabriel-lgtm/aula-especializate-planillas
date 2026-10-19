@@ -43,11 +43,11 @@
   <script src="course.config.js"></script>
   <script src="progress.js"></script>
   <script src="screens.js"></script>
-  <script>AulaScreens.initInicio();</script>
+  <script>AulaProgress.whenReady(function () { AulaScreens.initInicio(); });</script>
   <!-- App-shell: sidebar + header -->
   <script src="shell.js"></script>
   <!-- Ayuda guiada (product tour) -->
   <script src="tour.js"></script>
-  <script>AulaTour.init('inicio');</script>
+  <script>AulaProgress.whenReady(function () { AulaTour.init('inicio'); });</script>
 </body>
 </html>

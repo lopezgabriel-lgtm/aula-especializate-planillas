@@ -174,7 +174,8 @@
       stage('cert', !!s.certificate);
     }
 
-    apply(AP.load());
+    // Se dibuja cuando el progreso ya llegó del servidor (sin localStorage).
+    AP.whenReady(function () { apply(AP.load()); });
     window.__idx = { apply: apply, resumeUrl: resumeUrl };
   })();
   </script>

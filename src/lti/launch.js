@@ -26,6 +26,7 @@ import {
   CLAIM, MESSAGE_TYPE_RESOURCE_LINK, LTI_VERSION,
 } from './claims.js';
 import { buildIdentity } from './identity.js';
+import { safeSameOriginTarget } from './target.js';
 
 function fail(res, code, msg) {
   return res.status(code).type('text/plain').send('LTI launch rechazado: ' + msg);
@@ -91,8 +92,8 @@ export async function handleLaunch(req, res) {
   // 10) Identidad estable + sesión.
   const identity = buildIdentity(payload);
 
-  // Destino tras el login: target_link_uri del token si es de nuestro origen,
-  // si no el de la transacción, si no la entrada por defecto del aula.
+  // Destino tras el login: target_link_uri del token si cuelga de nuestro prefijo
+  // y no es una ruta LTI; si no, la entrada por defecto del aula (ver target.js).
   const target = safeSameOriginTarget(
     payload[CLAIM.TARGET_URI] || tx.targetLinkUri
   );
@@ -112,16 +113,4 @@ export async function handleLaunch(req, res) {
       return res.redirect(302, target);
     });
   });
-}
-
-// Solo permitimos redirigir dentro de nuestro propio origen (evita open-redirect).
-function safeSameOriginTarget(candidate) {
-  const fallback = config.publicBaseUrl + config.aula.entry;
-  if (!candidate) return fallback;
-  try {
-    const u = new URL(candidate, config.publicBaseUrl);
-    const base = new URL(config.publicBaseUrl);
-    if (u.origin === base.origin) return u.pathname + u.search + u.hash;
-  } catch { /* noop */ }
-  return fallback;
 }
