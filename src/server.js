@@ -71,11 +71,15 @@ async function main() {
       useDefaults: true,
       directives: {
         'script-src': ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
+        // Videos del aula: solo YouTube (el resto de iframes sigue bloqueado).
+        'frame-src': ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
         'frame-ancestors': frameAncestors,
         'upgrade-insecure-requests': null,
       },
     },
     frameguard: false,               // usamos frame-ancestors (CSP), no X-Frame-Options
+    // Con 'no-referrer' (default de helmet) el reproductor de YouTube rechaza el embed.
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: false,
   }));
