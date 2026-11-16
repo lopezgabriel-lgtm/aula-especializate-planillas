@@ -867,7 +867,7 @@ window.AulaProgress = (function () {
     setText('status-general', generalStatusText(state));
 
     setText('cert-msg', isUnlocked('certificate', state)
-      ? 'Accedé a Moodle para consultar y descargar tu certificado. La aprobación y la disponibilidad se validan allí.'
+      ? 'Accedé al campus virtual de moodle para consultar y descargar tu certificado. La aprobación y la disponibilidad se validan allí.'
       : 'Completá la Evaluación final para habilitar este acceso.');
 
     // --- Insignias gamificadas: insignia actual (hero) + strip + modales ---
@@ -992,7 +992,7 @@ window.AulaProgress = (function () {
     if (done) {
       done.addEventListener('click', function () {
         if (getFlag(load(), 'final.quiz')) return; // ya estaba marcado
-        var ok = window.confirm('¿Confirmás que ya rendiste el cuestionario final en Moodle? Con esto se habilitará tu certificación.');
+        var ok = window.confirm('¿Confirmás que ya rendiste el cuestionario final en el campus virtual de moodle? Con esto se habilitará tu certificación.');
         if (!ok) return;
         complete('final.quiz');
         showToast('¡Cuestionario final completado! Ya podés acceder a tu certificación.', 'achievement');

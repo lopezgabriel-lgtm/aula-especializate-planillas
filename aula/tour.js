@@ -85,11 +85,11 @@ window.AulaTour = (function () {
     /* ---------- CUESTIONARIO / cierre de módulo (concepto + navegación) ---------- */
     cuestionario: [
       { target: '.cq-card', title: 'El cierre del módulo', text: 'Este es el último paso del módulo: el cuestionario final. Al marcarlo como realizado, cerrás el módulo y desbloqueás el siguiente.' },
-      { target: '.cq-card', title: 'Se rinde en Moodle', text: 'El cuestionario se realiza en Moodle. Para acceder necesitás estar logueado en tu cuenta del aula virtual. Se abre en una pestaña nueva.' },
-      { target: null, fallback: true, title: 'Cómo se aprueba', text: 'Para aprobar necesitás una calificación de 7 o más en Moodle. Con esa nota, volvé al aula y marcá el cuestionario como realizado para cerrar el módulo.' },
-      { target: null, fallback: true, title: 'Si todavía no llegás a 7', text: 'Podés volver a intentarlo las veces que necesites. Te recomendamos aprobar antes de avanzar. Moodle controla la secuencia de los cuestionarios: aunque puedas continuar con algunos contenidos desde esta aula, el siguiente cuestionario permanecerá bloqueado hasta que apruebes el anterior.' },
+      { target: '.cq-card', title: 'Se rinde en moodle', text: 'El cuestionario se realiza en el campus virtual de moodle. Para acceder necesitás estar logueado en tu cuenta del aula virtual. Se abre en una pestaña nueva.' },
+      { target: null, fallback: true, title: 'Cómo se aprueba', text: 'Para aprobar necesitás una calificación de 7 o más en el campus virtual de moodle. Con esa nota, volvé al aula y marcá el cuestionario como realizado para cerrar el módulo.' },
+      { target: null, fallback: true, title: 'Si todavía no llegás a 7', text: 'Podés volver a intentarlo las veces que necesites. Te recomendamos aprobar antes de avanzar. El campus virtual de moodle controla la secuencia de los cuestionarios: aunque puedas continuar con algunos contenidos desde esta aula, el siguiente cuestionario permanecerá bloqueado hasta que apruebes el anterior.' },
       { target: null, fallback: true, title: 'La certificación del curso', text: 'Recordá que para acceder a la certificación necesitás tener todos los cuestionarios aprobados. Por eso conviene ir completándolos a medida que avanzás.' },
-      { target: '[data-close-module]', title: 'Cuando termines el cuestionario', text: 'Una vez que completes el cuestionario en Moodle, volvé al aula y marcá esta instancia como realizada para registrar tu avance y continuar con el recorrido.' },
+      { target: '[data-close-module]', title: 'Cuando termines el cuestionario', text: 'Una vez que completes el cuestionario en el campus virtual de moodle, volvé al aula y marcá esta instancia como realizada para registrar tu avance y continuar con el recorrido.' },
       { target: '[data-tour-open]', title: 'Ayuda siempre a mano', text: 'Podés volver a ver esta guía cuando quieras desde este botón:', demo: '<span class="tour-demo-btn" aria-hidden="true"><span class="tour-demo-q">?</span><span class="tour-demo-tx">Ayuda</span></span>' }
     ]
   };

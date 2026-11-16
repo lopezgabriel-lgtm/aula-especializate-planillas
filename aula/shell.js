@@ -147,9 +147,9 @@ window.AulaShell = (function () {
       ['¿Qué es la experiencia (XP)?', 'Es la experiencia que vas sumando al completar contenidos. Funciona como indicador de tu progreso: cuanto más avanzás, más XP acumulás.'],
       ['¿Para qué sirven las insignias?', 'Reconocen tus logros. <strong>Iniciante:</strong> etapa inicial. <strong>Explorador:</strong> Módulo 1. <strong>Arquitecto:</strong> Módulo 3. <strong>Experto:</strong> Módulo 5.'],
       ['¿Cómo se desbloquean unidades y módulos?', 'Dentro de cada módulo las unidades se abren de a una: la siguiente se habilita al completar la anterior. Y el módulo siguiente se abre al terminar el actual.'],
-      ['¿Cuándo se habilitan los cuestionarios?', 'El cuestionario de cada módulo se habilita al completar todas sus unidades. Se rinde en Moodle (con tu cuenta del aula virtual) y después lo marcás como realizado para cerrar el módulo.'],
+      ['¿Cuándo se habilitan los cuestionarios?', 'El cuestionario de cada módulo se habilita al completar todas sus unidades. Se rinde en el campus virtual de moodle (con tu cuenta del aula virtual) y después lo marcás como realizado para cerrar el módulo.'],
       ['¿Cómo llego a la certificación?', 'Al completar los 5 módulos y aprobar los cuestionarios, se habilita la Evaluación final. Una vez aprobada, podés acceder a tu certificación desde Moodle.'],
-      ['¿Qué pasa con mi progreso si salgo del aula?', 'Tu progreso está asociado a tu cuenta de Moodle. Podés salir cuando quieras y, cuando vuelvas, solo tenés que ingresar nuevamente al aula desde Moodle. Vas a continuar desde donde lo dejaste.']
+      ['¿Qué pasa con mi progreso si salgo del aula?', 'Tu progreso está asociado a tu cuenta con la que ingresas al campus virtual de moodle. Podés salir cuando quieras y, cuando vuelvas, solo tenés que ingresar nuevamente al aula desde Moodle. Vas a continuar desde donde lo dejaste.']
     ].map(function (qa) { return '<dt>' + qa[0] + '</dt><dd>' + qa[1] + '</dd>'; }).join('');
 
     return '' +
@@ -169,7 +169,7 @@ window.AulaShell = (function () {
           '<h2 class="sb-modal-tt">¿Necesitás ayuda?</h2>' +
           '<p class="ct-tx">Si tenés dudas sobre el contenido o problemas con la plataforma, escribinos y te damos una mano.</p>' +
           '<a class="ct-mail" href="mailto:especializate@bue.edu.ar">' + IC.mail + ' especializate@bue.edu.ar</a>' +
-          '<p class="ct-note">Recordá que los cuestionarios se rinden en Moodle: necesitás estar logueado en tu cuenta del aula virtual.</p>' +
+          '<p class="ct-note">Recordá que los cuestionarios se rinden dentro del campus virtual de moodle: necesitás estar logueado en tu cuenta del aula virtual.</p>' +
           '<p class="ct-note">Podés seguir avanzando por los contenidos aunque todavía tengas cuestionarios pendientes de aprobación. Por eso, es importante que revises tu avance en Moodle y te asegures de completar y aprobar cada cuestionario para poder acceder a la Evaluación final y a la certificación.</p>' +
         '</div>' +
       '</div>';
