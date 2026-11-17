@@ -149,7 +149,7 @@ window.AulaScreens = (function () {
         '</section>' +
         promptbookCard(mod) +
         '<div class="mi-cta">' +
-          '<div class="mi-note">' + IC.info + '<span>Completá todas las unidades y marcá como realizado el <b>cuestionario del módulo</b> (se rinde en Moodle) para sumar XP y <b>desbloquear el siguiente</b> módulo.</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>Completá todas las unidades y marcá como realizado el <b>cuestionario del módulo</b> (se rinde en en el campus virtual de moodle) para sumar XP y <b>desbloquear el siguiente</b> módulo.</span></div>' +
           '<a class="btn btn-complete mi-start" href="unidad.html?m=' + n + '&u=' + startU + '">' + IC.play + ' Comenzar Módulo ' + n + '</a>' +
         '</div>' +
       '</div>';
@@ -655,7 +655,7 @@ window.AulaScreens = (function () {
     var quizCard =
       '<div class="cq-card">' +
         '<span class="cq-card-ic">' + IC.quiz + '</span>' +
-        '<div class="cq-card-tx"><b>Cuestionario del módulo</b><span>Se rinde en Moodle. Al marcarlo como realizado, cerrás el módulo.</span></div>' +
+        '<div class="cq-card-tx"><b>Cuestionario del módulo</b><span>Se rinde en el campus virtual de moodle. Al marcarlo como realizado, cerrás el módulo.</span></div>' +
         (mod.quizUrl ? '<a class="ub-open btn cq-open" href="' + esc(mod.quizUrl) + '" target="_blank" rel="noopener" data-quiz-visit>Ir al cuestionario ' + IC.ext + '</a>' : '') +
       '</div>';
 
@@ -673,14 +673,14 @@ window.AulaScreens = (function () {
           '<div class="ub-left">' +
             '<span class="mi-eyebrow">Módulo ' + n + ' · Cierre</span>' +
             '<h1 class="mi-title">Cuestionario final</h1>' +
-            '<p class="mi-desc">Es el último paso del módulo. Rendí el cuestionario en Moodle y marcalo como realizado para cerrar el módulo y desbloquear el siguiente.</p>' +
+            '<p class="mi-desc">Es el último paso del módulo. Rendí el cuestionario en campus virtual de moodle, luego volvé y marcalo como realizado para cerrar el módulo y desbloquear el siguiente.</p>' +
           '</div>' +
           '<div class="ub-right"><div class="cq-badge ' + (done ? 'is-done' : 'is-open') + '">' + (done ? IC.checkC + ' Completado' : IC.quiz + ' Disponible') + '</div></div>' +
         '</div>' +
         quizCard +
         (lastDone ? finalInvite() : '') +
         '<div class="ub-cta">' +
-          '<div class="mi-note">' + IC.info + '<span>' + (done ? 'Cuestionario marcado como realizado. El módulo quedó <b>completado</b>.' : 'Primero <b>abrí el cuestionario</b> en Moodle; después vas a poder marcarlo como realizado.') + '</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>' + (done ? 'Cuestionario marcado como realizado. El módulo quedó <b>completado</b>.' : 'Primero <b>abrí el cuestionario</b> en el campus virtual de moodle; después vas a poder marcarlo como realizado.') + '</span></div>' +
           '<div class="ub-cta-actions">' + cta + '</div>' +
         '</div>' +
       '</div>';
@@ -910,13 +910,13 @@ window.AulaScreens = (function () {
               '<span class="fn-close-ic">' + IC.checkC + '</span>' +
               '<span class="mi-eyebrow">Cierre del recorrido</span>' +
               '<h1 class="fn-done-title">Evaluación final realizada</h1>' +
-              '<p class="fn-done-lead">Registramos esta instancia como realizada. La aprobación y la disponibilidad de tu certificado se validan en Moodle.</p>' +
+              '<p class="fn-done-lead">Registramos esta instancia como realizada. La aprobación y la disponibilidad de tu certificado se validan dentro del campus virtual de moodle.</p>' +
               logros +
             '</section>' +
             '<section class="fn-cert-card">' +
               '<h2 class="fn-sec-tt">Tu certificado</h2>' +
               preview +
-              '<p class="fn-cert-msg">Si completaste y aprobaste todos los cuestionarios y la Evaluación final, podés acceder a Moodle para consultar y descargar tu certificado.</p>' +
+              '<p class="fn-cert-msg">Si completaste y aprobaste todos los cuestionarios y la Evaluación final, podés acceder a moodle para consultar y descargar tu certificado.</p>' +
               '<div class="fn-cert-req">' + IC.info + '<span>' + esc(certReqText) + '</span></div>' +
               '<div class="fn-cert-actions">' +
                 certPrimary +
@@ -950,7 +950,7 @@ window.AulaScreens = (function () {
           '</div>' +
         '</div>' +
         '<div class="ub-cta fn-approve">' +
-          '<div class="mi-note">' + IC.info + '<span>La evaluación final se rinde en Moodle. Cuando la termines, marcala como realizada para registrar tu avance. Recordá que la aprobación se valida en Moodle.</span></div>' +
+          '<div class="mi-note">' + IC.info + '<span>La evaluación final se rinde en el campus virtual de moodle. Cuando la termines, marcala como realizada para registrar tu avance. Recordá que la aprobación se valida en Moodle.</span></div>' +
           '<div class="ub-cta-actions">' +
             '<button type="button" class="btn btn-complete" data-approve-final ' + (visited ? '' : 'disabled') + '>' + IC.checkC + ' Marcar evaluación como realizada</button>' +
           '</div>' +
