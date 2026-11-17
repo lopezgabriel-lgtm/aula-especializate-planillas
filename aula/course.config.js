@@ -21,7 +21,7 @@ window.COURSE_CONFIG = {
         "required": true,
         "label": "Sobre especIAlizate",
         "kind": "video",
-        "youtubeId": "tc5-5os3mDk",
+        "youtubeId": "wtJB_R8RSrQ",
         "description": "Mirá este video para conocer qué es especIAlizate y cómo está organizado el recorrido."
       },
       {
@@ -29,7 +29,7 @@ window.COURSE_CONFIG = {
         "required": true,
         "label": "Introducción al curso",
         "kind": "video",
-        "youtubeId": "mEFWBdhKSgY",
+        "youtubeId": "6skKuIM3K0c",
         "description": "En este video vas a conocer la propuesta del curso y cómo se organiza el recorrido."
       },
       {
