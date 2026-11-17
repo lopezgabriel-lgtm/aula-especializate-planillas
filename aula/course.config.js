@@ -21,7 +21,7 @@ window.COURSE_CONFIG = {
         "required": true,
         "label": "Sobre especIAlizate",
         "kind": "video",
-        "youtubeId": "wtJB_R8RSrQ",
+        "youtubeId": "ftVvmn23PqE",
         "description": "Mirá este video para conocer qué es especIAlizate y cómo está organizado el recorrido."
       },
       {
@@ -37,7 +37,7 @@ window.COURSE_CONFIG = {
         "required": true,
         "label": "Programa del curso",
         "kind": "pdf",
-        "url": "https://drive.google.com/file/d/1WJmM2uzwEAPCooK0HIVVnIdKOIZhxR6X/view?usp=sharing",
+        "url": "https://drive.google.com/file/d/1JwaPmFTqt9BYOUaMLuCzVnpGO9BKmLxr/view",
         "description": "Consultá el programa para conocer la propuesta formativa, los objetivos y la modalidad de cursada."
       }
     ]
