@@ -368,9 +368,16 @@ window.AulaProgress = (function () {
     ['especializate', 'programa', 'introduccion'].forEach(function (k) {
       target.intro[k] = target.intro[k] || src.intro[k];
     });
-    Object.keys(target.modules).forEach(function (n) {
-      ['u1', 'u2', 'u3', 'u4', 'quiz'].forEach(function (k) {
-        target.modules[n][k] = target.modules[n][k] || (src.modules[n] && src.modules[n][k]);
+     Object.keys(target.modules).forEach(function (n) {
+      var tm = target.modules[n], sm = src.modules[n] || {};
+      // Data-driven: une TODAS las claves de unidad presentes en cualquiera de los
+      // dos estados (u1, u2, ... uN) ademas del quiz. Antes estaba fijo en u1..u4,
+      // lo que perdia la unidad 5 de los modulos de 5 unidades al sincronizar.
+      var keys = { quiz: true };
+      unitKeysOf(tm).forEach(function (k) { keys[k] = true; });
+      unitKeysOf(sm).forEach(function (k) { keys[k] = true; });
+      Object.keys(keys).forEach(function (k) {
+        tm[k] = tm[k] || sm[k];
       });
     });
     target.final.quiz = target.final.quiz || src.final.quiz;
